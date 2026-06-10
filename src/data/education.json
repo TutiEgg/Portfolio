@@ -1,0 +1,18 @@
+[
+  {
+    "id": "bsc-medieninformatik-hfu",
+    "degree": "Bachelor of Science",
+    "subject": "Medieninformatik",
+    "institution": "Hochschule Furtwangen (HFU)",
+    "period": "Abschluss 2024",
+    "location": "Furtwangen, Deutschland",
+    "summary": "Interdisziplinäres Studium an der Schnittstelle aus Softwareentwicklung, Mathematik und Mediengestaltung mit Fokus auf Machine Learning und KI-gestützte Anwendungen.",
+    "highlights": [
+      "Machine Learning & KI",
+      "Software Engineering",
+      "Lineare Algebra & Statistik",
+      "Medien- & Interaktionsdesign"
+    ],
+    "link": { "label": "Hochschule Furtwangen", "url": "https://www.hs-furtwangen.de/" }
+  }
+]

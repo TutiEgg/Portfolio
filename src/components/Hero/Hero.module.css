@@ -1,0 +1,250 @@
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-16) var(--space-8) var(--space-24);
+  overflow: hidden;
+}
+
+.inner {
+  width: 100%;
+  max-width: 1100px;
+  display: grid;
+  grid-template-columns: minmax(220px, 320px) 1fr;
+  gap: var(--space-16);
+  align-items: center;
+}
+
+.photoWrapper {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  will-change: transform;
+}
+
+.photoGlow {
+  position: absolute;
+  inset: -8%;
+  border-radius: var(--radius-full);
+  background: conic-gradient(
+    from 0deg,
+    var(--color-accent),
+    var(--color-secondary),
+    var(--color-accent)
+  );
+  filter: blur(18px);
+  opacity: 0.5;
+  z-index: 0;
+  animation: spinGlow 10s linear infinite;
+}
+
+.photoWrapper:hover .photoGlow {
+  opacity: 0.8;
+}
+
+@keyframes spinGlow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.photo {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--radius-full);
+  border: 3px solid var(--color-bg);
+  background: var(--color-bg-elevated);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.role {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--color-accent);
+  margin: 0;
+}
+
+.name {
+  font-size: var(--text-5xl);
+  line-height: 1.05;
+  background: linear-gradient(
+    120deg,
+    var(--color-text) 0%,
+    var(--color-accent) 80%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.tagline {
+  font-size: var(--text-xl);
+  color: var(--color-text);
+  max-width: 55ch;
+}
+
+.bio {
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+  max-width: 60ch;
+  margin-top: var(--space-2);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.metaItem {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: inherit;
+  transition: color 0.2s var(--ease-out);
+}
+
+a.metaItem:hover {
+  color: var(--color-text);
+}
+
+.metaDot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  box-shadow: 0 0 8px var(--color-accent-glow);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-6);
+  margin-top: var(--space-8);
+}
+
+.ctaPrimary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-full);
+  background: linear-gradient(
+    120deg,
+    var(--color-accent),
+    var(--color-secondary)
+  );
+  color: #0a0e1a;
+  font-weight: 600;
+  font-size: var(--text-base);
+  box-shadow: 0 12px 30px var(--color-accent-glow);
+  transition: box-shadow 0.3s var(--ease-out);
+}
+
+.ctaPrimary:hover {
+  box-shadow: 0 16px 40px var(--color-accent-glow);
+}
+
+.socials {
+  list-style: none;
+  display: flex;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+}
+
+.socialLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  transition: color 0.25s var(--ease-out),
+    background 0.25s var(--ease-out), border-color 0.25s var(--ease-out);
+}
+
+.socialLink:hover {
+  color: var(--color-text);
+  background: var(--color-surface-hover);
+  border-color: var(--color-accent);
+}
+
+.scrollHint {
+  position: absolute;
+  bottom: var(--space-8);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-text-subtle);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.scrollHintLine {
+  width: 1px;
+  height: 48px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--color-accent),
+    transparent
+  );
+}
+
+@media (max-width: 900px) {
+  .hero {
+    padding: var(--space-16) var(--space-6) var(--space-24);
+  }
+
+  .inner {
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+    text-align: center;
+  }
+
+  .photoWrapper {
+    justify-self: center;
+    width: min(240px, 60vw);
+  }
+
+  .tagline,
+  .bio {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .meta,
+  .actions {
+    justify-content: center;
+  }
+
+  .name {
+    font-size: var(--text-4xl);
+  }
+}

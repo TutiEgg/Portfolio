@@ -1,0 +1,147 @@
+.yearIndex {
+  position: fixed;
+  right: var(--space-6);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 50;
+  pointer-events: none;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: var(--space-2) 0;
+  scrollbar-width: none;
+}
+
+.yearIndex::-webkit-scrollbar {
+  display: none;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  pointer-events: auto;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+}
+
+.button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-1) var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-subtle);
+  transition: color 0.3s var(--ease-out);
+}
+
+.button:hover {
+  color: var(--color-text);
+}
+
+.button.isActive {
+  color: var(--color-text);
+}
+
+.dot {
+  position: relative;
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--color-border-strong);
+  background: var(--color-bg);
+  transition: border-color 0.3s var(--ease-out),
+    transform 0.3s var(--ease-out);
+  flex-shrink: 0;
+}
+
+.button:hover .dot {
+  border-color: var(--color-accent);
+  transform: scale(1.2);
+}
+
+.activeDot {
+  position: absolute;
+  inset: -2px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  box-shadow: 0 0 12px var(--color-accent-glow);
+}
+
+/* --- Labels (year + month) ------------------------------------------------ */
+
+.label {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+  transition: transform 0.3s var(--ease-out);
+}
+
+.year {
+  font-weight: 700;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  min-width: 3.2ch;
+}
+
+.yearPlaceholder {
+  display: inline-block;
+  min-width: 3.2ch;
+  visibility: hidden;
+}
+
+.month {
+  font-weight: 500;
+  color: var(--color-text-subtle);
+  text-transform: uppercase;
+}
+
+.button:hover .year,
+.button:hover .month {
+  color: var(--color-text);
+}
+
+.button.isActive .year {
+  color: var(--color-accent-hover);
+}
+
+.button.isActive .month {
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+.button.isActive .label {
+  transform: scale(1.08);
+  transform-origin: left center;
+}
+
+.activeLine {
+  position: absolute;
+  right: calc(100% + var(--space-3));
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 2px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--color-accent)
+  );
+  pointer-events: none;
+  border-radius: var(--radius-full);
+}
+
+@media (max-width: 900px) {
+  .yearIndex {
+    display: none;
+  }
+}

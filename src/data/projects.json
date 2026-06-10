@@ -1,0 +1,588 @@
+[
+  {
+    "id": "rilkosan-2026",
+    "title": "RILKOSAN — Echtzeitfähige Anomalieerkennung für industrielle EtherCAT-Netzwerke",
+    "month": "2026-03",
+    "exactDate": "Januar 2023 — März 2026 (Abschluss)",
+    "location": "U-Glow GmbH · BMFTR-Förderprojekt",
+    "image": "/images/rilkosan/setup.png",
+    "shortDescription": "Echtzeitfähiges Anomalie- und Intrusion-Detection-Framework für industrielle EtherCAT-Netzwerke. Kern ist eine hybride, vierschichtige Architektur aus Regel-Engine, Online-Learning (River / HalfSpaceTrees), LightGBM und einem Temporal Convolutional Network nach dem Prinzip Act Fast, Correct Later — ergänzt um einen selbstheilenden Netzwechsel-Mechanismus. Evaluiert auf 100 000 Frames mit zehn Anomalietypen und validiert auf einem realen Beckhoff-Testbed. Kernergebnisse als Journal-Whitepaper (Erstautor).",
+    "languages": ["Python"],
+    "tags": [
+      "Anomaly Detection",
+      "Intrusion Detection",
+      "Industrial Cybersecurity",
+      "EtherCAT",
+      "TwinCAT 3 / Beckhoff",
+      "Online Machine Learning",
+      "River · HalfSpaceTrees",
+      "LightGBM",
+      "Temporal Convolutional Network",
+      "Apache Kafka",
+      "Self-Healing Networks",
+      "OPC UA PA"
+    ],
+    "links": [
+      { "label": "Final Review Meeting (Hamburg, 26.03.2026)", "url": "https://www.bmftr.bund.de/" }
+    ],
+    "content": [
+      { "type": "heading", "level": 2, "text": "Worum geht es?" },
+      { "type": "image", "src": "/images/rilkosan/titelfolie.png", "alt": "RILKOSAN — Final Review Meeting, Hamburg 26.03.2026" },
+      { "type": "paragraph", "text": "Industrielle Steuerungssysteme sind das Rückgrat moderner Fertigung — und gleichzeitig zunehmend ein Ziel für Cyberangriffe. **EtherCAT**, eines der am weitesten verbreiteten Echtzeit-Ethernet-Protokolle in der Automatisierung, wurde auf Determinismus und Geschwindigkeit optimiert — **nicht auf Sicherheit**. Es verschlüsselt nicht, authentifiziert nicht und inspiziert die übertragenen Nutzdaten nicht. Klassische IT-Intrusion-Detection-Systeme sind für diese Umgebung zu langsam: Sie brauchen Millisekunden bis Sekunden, während ein EtherCAT-Zyklus oft nur **20 Millisekunden oder weniger** dauert." },
+      { "type": "paragraph", "text": "In **RILKOSAN** (Januar 2023 – März 2026, gefördert vom BMFTR) habe ich bei der U-Glow GmbH ein **echtzeitfähiges Anomalie- und Intrusion-Detection-Framework** für genau solche EtherCAT-basierten Industrienetzwerke konzipiert, implementiert und validiert — inklusive eines selbstheilenden Netzwechsel-Mechanismus. Die zentralen Ergebnisse sind in einem Journal-Whitepaper zusammengefasst, das als Erstautor entstanden ist." },
+
+      { "type": "heading", "level": 2, "text": "Meine Rolle" },
+      {
+        "type": "list",
+        "items": [
+          "**Konzeption & wissenschaftliche Ausarbeitung** des hybriden, vierschichtigen Detektionsansatzes — Whitepaper als Erstautor.",
+          "**Implementierung** der gesamten Detektionspipeline in Python: Regel-Engine, Online-Learning-Ensemble (River), LightGBM-Klassifizierer und Temporal Convolutional Network.",
+          "**Aufbau der Streaming-Infrastruktur** auf Apache Kafka — von der passiven EtherCAT-Erfassung bis zum Reporting.",
+          "**Entwurf der Self-Healing-Logik**: Feedback zwischen den Schichten plus automatischer Netzwechsel auf redundante Kommunikationspfade.",
+          "**Aufbau des realen Testbeds** mit Beckhoff-Hardware und systematische Evaluation auf einem 100 000-Frame-Datensatz mit zehn Anomalietypen.",
+          "**Ergänzend** konzeptioneller Beitrag zur event- und streamzentrierten Erweiterung des OPC UA PA Companion Standards."
+        ]
+      },
+
+      { "type": "heading", "level": 2, "text": "Die Herausforderung" },
+      {
+        "type": "list",
+        "items": [
+          "**Harte Echtzeit:** EtherCAT-Zykluszeiten liegen im Sub-Millisekundenbereich. Klassische Deep-Packet-Inspection-IDS verursachen Latenzen im Millisekundenbereich und sind damit in zeitkritischen Regelkreisen nicht einsetzbar.",
+          "**Payload-Blindheit:** Standard-Monitoring sieht nur Protokoll-Header. Prozessdaten wie Sensorwerte und Aktorbefehle bleiben opake Bytes — Angriffe wie Stuxnet manipulieren genau diese Nutzdaten innerhalb gültiger Protokollgrenzen.",
+          "**Concept Drift:** Reale Anlagen verändern sich über Jahre (Alterung, Prozessoptimierungen, neue Rezepte). Statisch trainierte Modelle verlieren kontinuierlich an Detektionsleistung.",
+          "**Fehlende Referenzdatensätze:** Für EtherCAT gibt es kaum öffentlich annotierte Anomaliedaten. Ein systematisches Framework zur kontrollierten Anomalie-Injektion war deshalb Teil der Arbeit."
+        ]
+      },
+
+      { "type": "heading", "level": 2, "text": "Vierschichtige Detektionsarchitektur" },
+      { "type": "paragraph", "text": "Die Lösung ist eine **hybride Architektur nach dem Prinzip Act Fast, Correct Later**: Vier Detektionsschichten analysieren jeden eingehenden Frame parallel, jede mit einem anderen Tradeoff aus Geschwindigkeit und Genauigkeit. Schnelle Schichten alarmieren sofort, langsamere Schichten korrigieren im Nachgang." },
+      {
+        "type": "list",
+        "items": [
+          "**Layer 1 — Regelbasiert** (< 0,1 ms): Deterministisches Regelwerk aus Protokollwissen und Domänenregeln (Wertsprünge, Level-Shifts, Jitter, CRC-Fehler, Working-Counter-Verletzungen). Konstante Laufzeit, vollständig erklärbar.",
+          "**Layer 2 — Online-Learning** (≈ 0,5 ms): Multi-Modell-Ensemble aus **HalfSpaceTrees** plus PyOD-Modellen (Isolation Forest, LOF, HBOS) und CUSUM, integriert über das **River-Framework**. Lernt kontinuierlich aus normalem Verkehr und reagiert adaptiv auf Concept Drift.",
+          "**Layer 3 — LightGBM** (≈ 0,2 s, 10-Frame-Fenster): Gradient-Boosting-Klassifikator mit 15 engineered Features (Trend, Flatness-Ratio, diskrete Wert-Statistik) zur typisierten Klassifikation von Anomalien. Temporal-Smoothing unterdrückt Einzel-Frame-False-Positives.",
+          "**Layer 4 — Temporal Convolutional Network** (≈ 1,0 s, 50-Frame-Sequenz): TCN mit dilated causal convolutions für langreichweitige zeitliche Abhängigkeiten. Erkennt schleichende Drift- und Clipping-Anomalien, die kurze Fenster verfehlen — und fungiert gleichzeitig als Feedback-Lehrer für die anderen Schichten."
+        ]
+      },
+      { "type": "image", "src": "/images/rilkosan/latency.png", "alt": "Inference-Latenz pro Frame (links) und Time-to-First-Detection inklusive Warmup (rechts) für L1–L4. L1/L2 reagieren innerhalb von Millisekunden, L3 nach 204 ms, L4 nach 1008 ms." },
+      { "type": "paragraph", "text": "Die Aufteilung erlaubt, je nach Einsatzszenario Layer zu kombinieren: für harte Safety-Critical-Responses reichen L1+L2 (unter 5 ms Reaktion), für Condition-Monitoring und Quality Control kommt L3 dazu, für Predictive Maintenance und Forensik wird der komplette Stack inklusive L4 genutzt." },
+
+      { "type": "heading", "level": 2, "text": "Selbstheilung: Feedback und Netzwechsel" },
+      { "type": "paragraph", "text": "Das spannendste Architekturelement ist die **Feedback-Rolle von Layer 4**: Widerspricht das TCN einem aktiven Alarm mit hoher Konfidenz, wird ein mehrstufiger Self-Healing-Prozess ausgelöst." },
+      {
+        "type": "list",
+        "items": [
+          "**L1-Schwellwerte** werden adaptiv nachjustiert, um False-Positive-Quellen zu dämpfen, ohne die Sensitivität zu verlieren.",
+          "**L2 erhält korrigierte Labels**: Frames, die L4 mit hoher Konfidenz als normal einstuft, werden explizit als Lernbeispiele freigegeben — L4 agiert damit als Lehrer im semi-überwachten Sinne.",
+          "**L3 triggert inkrementelles Retraining**, wenn das Agreement zwischen L3 und L4 über ein Zeitfenster zu niedrig wird.",
+          "**Route Switching:** Bei netzwerkbedingten Anomalien (RTT-Spike, Jitter-Ausreißer, Late Packet, Checksum-Error) schaltet ein Orchestrator automatisch auf eine redundante Kommunikationsroute um (IO-Link / WiFi) und fällt nach einem konfigurierbaren Recovery-Timer zurück auf die primäre EtherCAT-Route."
+        ]
+      },
+      { "type": "paragraph", "text": "Das Prinzip dahinter: netzwerkbedingte Anomalien werden nicht nur **erkannt**, sondern **aktiv mitigiert**, ohne den übergeordneten Produktionsprozess zu unterbrechen." },
+
+      { "type": "heading", "level": 2, "text": "Evaluation — 100 000 Frames, 10 Anomalietypen" },
+      { "type": "paragraph", "text": "Für eine reproduzierbare Bewertung wurde ein synthetischer Datensatz mit **100 000 Frames** erzeugt (50 Hz, 20 ms Zykluszeit), in den über einen Anomaly-Injector systematisch **zehn Anomalietypen** eingebettet wurden:" },
+      {
+        "type": "list",
+        "items": [
+          "**Sensor-Ebene:** Clipping, Freeze, Quantisierung, Impulse Noise, Regime Shift, Burst Pattern, Drift, Bias, Variance Jump, Relation Break ohne Jitter.",
+          "**Netzwerkebene (zusätzlich):** RTT-Spike, Jitter, Late Packet, Checksum-Error — diese dienen gleichzeitig als Trigger für den automatischen Netzwechsel."
+        ]
+      },
+      { "type": "paragraph", "text": "Jede injizierte Anomalie ist mit Start, Ende und Typ annotiert — damit steht für jede Schicht eine saubere Ground-Truth für Precision, Recall und F1-Score zur Verfügung. Die Kernergebnisse:" },
+      {
+        "type": "list",
+        "items": [
+          "**Layer 1 (Regelbasiert):** Accuracy 68,3 % · Precision 32,6 % · Recall 55,0 % · F1 0,41 — schnell, aber grob.",
+          "**Layer 2 (River HST + Ensemble):** Accuracy 79,5 % · Precision 49,1 % · Recall 69,4 % · F1 0,58 — adaptiv, fängt statistische Outlier.",
+          "**Layer 3 (LightGBM, 10 Frames):** Accuracy 93,5 % · Precision 82,5 % · Recall 85,5 % · F1 0,84 — gute Balance aus Genauigkeit und Latenz.",
+          "**Layer 4 (TCN, 50 Frames):** Accuracy **98,1 %** · Precision 95,5 % · Recall 94,7 % · F1 **0,95** — State-of-the-Art für alle getesteten Typen.",
+          "**Ensemble L1 + L2 + L3** (Praxisempfehlung): Accuracy 91,3 % · **Recall 94,1 %** · Precision 71,3 % — optimaler Tradeoff aus Sensitivität und Reaktionsgeschwindigkeit."
+        ]
+      },
+      { "type": "image", "src": "/images/rilkosan/metrics_per_layer.png", "alt": "Accuracy, Precision und Recall je Detektionsschicht — L4 erreicht nahezu perfekte Werte, das L1+L2+L3-Ensemble liefert den besten Praxis-Tradeoff mit 94 % Recall." },
+      { "type": "paragraph", "text": "Besonders interessant ist das Muster **pro Anomalietyp**: Abrupte Ereignisse (Clipping, Regime Shift, Impulse Noise) werden bereits von L3 sehr zuverlässig erkannt. Subtile, graduelle Anomalien (Drift, Bias, Variance Jump, Relation Break) erfordern die Sequenzmodellierung von L4 — dort springt der Recall von etwa 80 % auf > 95 %." },
+      { "type": "image", "src": "/images/rilkosan/recall_per_anomaly.png", "alt": "Recall je Anomalietyp für L1–L4. L1 bleibt konstant um 55 %, L3 deckt abrupte Anomalien gut ab, nur L4 erreicht für subtile Typen wie Drift, Bias und Variance Jump konsistent > 95 %." },
+
+      { "type": "heading", "level": 2, "text": "Realer EtherCAT-Demonstrator" },
+      { "type": "paragraph", "text": "Die Konzepte wurden anschließend auf einem **realen Testbed** validiert. Zwei **Beckhoff CX9020** Embedded-Controller mit **EK1100 EtherCAT-Klemmen** bilden zwei verteilte Steuerungssegmente, gekoppelt über eine **Beckhoff EL6695 EtherCAT-Bridge** als Distributed-Clocks-Referenz. Ein PC mit zwei **Intel i210**-Netzwerkkarten dient als transparente Inline-Bridge und zeichnet den Verkehr mit IEEE-1588-Hardware-Zeitstempeln auf." },
+      { "type": "image", "src": "/images/rilkosan/architektur.png", "alt": "Testbed-Architektur: Industrial Control (SPS 1/2), EtherCAT-Feldnetz, transparente Inline-Capture über zwei Intel-i210-NICs, Wireshark, Feature-Engineering und Kafka-Pipeline zum Detektor." },
+      { "type": "paragraph", "text": "Die passive Erfassung greift nicht in den Kommunikationspfad ein: Der Inline-Bridge-PC leitet jeden Frame bitidentisch weiter und stellt parallel eine Kopie über Wireshark und einen Feature-Extractor auf das Kafka-Topic `net.sim` bereit. Von dort konsumieren Detektor und Reporter in Echtzeit." },
+      { "type": "image", "src": "/images/rilkosan/setup.png", "alt": "Realer EtherCAT-Demonstrator: zwei Beckhoff CX9020 Embedded-PCs, EtherCAT-Klemmen und ein Qualcomm-basiertes Funkmodul als zweiter, drahtloser Kommunikationspfad" },
+      { "type": "paragraph", "text": "Das Qualcomm-basierte Funkmodul rechts im Bild bildet den **redundanten Pfad**, auf den der selbstheilende Mechanismus bei Netzwerkstörungen automatisch umschaltet. Die komplette Pipeline — passive Erfassung, Kafka-Transport, vierschichtige Detektion und Reporting — läuft parallel zum regulären EtherCAT-Verkehr und greift zu keinem Zeitpunkt in die Steuerung ein." },
+      {
+        "type": "list",
+        "items": [
+          "**Hardware:** 2× Beckhoff **CX9020** (ARM Cortex-A8, TwinCAT 3), EtherCAT-Klemmen **EK1100**, Beckhoff **EL6695** EtherCAT-Bridge, 2× Intel **i210**-NICs mit IEEE-1588-Timestamping, Qualcomm-Funkmodul als Zweitpfad.",
+          "**Software-Stack:** TwinCAT 3 auf der Feldebene, **Python** für Detektor, Anomaly-Injector und Reporter, **Apache Kafka** als Streaming-Rückgrat, **River** + **LightGBM** + **PyTorch (TCN)** als ML-Bausteine, **Wireshark** für die passive Verkehrserfassung.",
+          "**Messgrößen:** Detektions-Accuracy pro Anomalietyp, Inference-Latenz pro Frame, Time-to-First-Detection inklusive Warmup, Failover-Latenz beim Netzwechsel."
+        ]
+      },
+
+      { "type": "heading", "level": 2, "text": "Ergänzend: OPC UA PA Event-Erweiterung" },
+      { "type": "paragraph", "text": "Parallel zur Detektionsarchitektur ist im Projekt ein zweiter konzeptioneller Baustein entstanden: eine **event- und streamzentrierte Erweiterung** des OPC UA PA Companion Standards. Neue ObjectTypes (**EventStream**, **EventProducer**/**-Consumer**, **CommunicationChannel**, **NetworkInterface**) und EventTypes (**StateChange-**, **Anomaly-**, **Escalation-**, **NetworkChangeEvent**) modellieren kontinuierliche Datenströme und Anomalien als first-class Elemente im Informationsmodell. Damit lassen sich die RILKOSAN-Detektions- und Self-Healing-Events direkt standardkonform in bestehende Automatisierungslandschaften einbetten." },
+
+      { "type": "heading", "level": 2, "text": "Ergebnis & Einordnung" },
+      {
+        "type": "list",
+        "items": [
+          "Eine **hybride, vierschichtige Detektionsarchitektur**, die regelbasierte, adaptive und tief-sequenzielle Verfahren unter einem einzigen Streaming-Dach vereint — mit klar getrennten Latenz-Budgets von unter 0,1 ms bis ca. 1 s.",
+          "Ein **funktionsfähiger Self-Healing-Mechanismus**, der netzwerkbedingte Anomalien nicht nur erkennt, sondern aktiv durch automatischen Netzwechsel mitigiert.",
+          "Ein systematisches **Injektions- und Evaluations-Framework** mit reproduzierbarer Ground-Truth für zehn Anomalietypen — Grundlage für quantitativ belastbare Vergleiche.",
+          "Die Arbeit liegt als **Journal-Whitepaper** vor (Erstautor) und wurde im finalen Review-Meeting am 26.03.2026 in Hamburg präsentiert. Die Konzepte fließen in Folgeentwicklungen und in den OPC Foundation PA-Arbeitskreis ein."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "project-charta-2025",
+    "title": "Project Charta — KI-gestützte Gefahrenerkennung entlang Pipeline-Trassen",
+    "month": "2025-10",
+    "exactDate": "Juli — Oktober 2025",
+    "location": "Privates Projekt · Solo-Entwicklung",
+    "image": "/images/project-charta/hero.png",
+    "shortDescription": "Browser-basierte Analyseplattform, die entlang einer hochgeladenen Pipeline-Trasse (KML / GeoJSON) automatisch Satellitenbilder lädt, Bäume und Gebäude mit einer zweistufigen KI-Pipeline aus YOLOv8 und ResNet-18 erkennt und anhand geometrischer Pufferzonen ein quantitatives Risiko-Label pro Objekt berechnet. Komplett alleine gebaut — Frontend (React + Leaflet), Backend (FastAPI + Celery), ML-Pipeline (PyTorch) und GIS-Stack (GeoPandas, Shapely, Rasterio, PyProj).",
+    "languages": ["Python", "JavaScript"],
+    "tags": [
+      "Computer Vision",
+      "Object Detection",
+      "Semantic Segmentation",
+      "YOLOv8",
+      "ResNet-18",
+      "PyTorch",
+      "Satellite Imagery",
+      "Remote Sensing",
+      "GIS",
+      "GeoPandas · Shapely · Rasterio",
+      "FastAPI",
+      "React 19 · Leaflet · Turf.js",
+      "Celery · Redis",
+      "Docker Compose"
+    ],
+    "links": [],
+    "content": [
+      { "type": "heading", "level": 2, "text": "Worum geht es?" },
+      { "type": "image", "src": "/images/project-charta/hero.png", "alt": "Project Charta — Hauptansicht der Anwendung mit Satellitenbild und analysierter Pipeline-Trasse" },
+      { "type": "paragraph", "text": "Versorgungsleitungen — Wasser, Gas, Fernwärme — verlaufen oft über viele Kilometer durch besiedeltes Gebiet. In den definierten Schutzzonen entlang der Trassen dürfen weder Gebäude noch tiefwurzelnde Bäume stehen, weil Wurzeln Leitungen beschädigen und umstürzende Bäume sie zerreißen können. Die Kontrolle dieser Zonen erfolgt in der Praxis bis heute **manuell**: Luftbilder, Flurkarten, Ortsbegehungen. Für einen Trassenabschnitt sind das **Wochen an Arbeit** — und illegale Überbauung wird häufig erst entdeckt, wenn bereits Schaden entstanden ist." },
+      { "type": "paragraph", "text": "**Project Charta** ist ein privates Solo-Projekt, in dem ich diesen Prozess komplett automatisiert habe: Pipeline-Geometrie hochladen, Satellitenbilder werden automatisch entlang der Trasse geladen und gekachelt, eine zweistufige KI-Pipeline erkennt und verifiziert Gefahrenobjekte, und ein GIS-Modul berechnet Abstände, Pufferzonen und Risiko-Labels. Das Ergebnis ist eine interaktive Karte plus exportierbarer Report — aus Wochen werden Minuten." },
+
+      { "type": "heading", "level": 2, "text": "Meine Rolle" },
+      {
+        "type": "list",
+        "items": [
+          "**Full-Stack-Entwicklung** als Solo-Projekt: Frontend, Backend, ML-Pipeline, GIS-Stack und Infrastruktur komplett alleine konzipiert und implementiert.",
+          "**Frontend** (React 19, Vite 6, Leaflet, Turf.js): interaktive Kartenansicht mit Layer-Management, Upload-Flow, Crop- und Tiling-Vorschau, Echtzeit-Progress-Timeline und Report-Panel — mehrsprachig (DE / EN).",
+          "**Backend** (FastAPI + Celery + Redis): asynchrone Orchestrierung der vierstufigen Analyse-Pipeline, Status-Streaming zum Frontend, persistierte Run-Historie.",
+          "**ML-Pipeline** (PyTorch): Training und Deployment der YOLOv8-Modelle (Stage 1) sowie Aufbau des ResNet-18 mit 4-Kanal-Input (RGB + Segmentierungsmaske) als Verifikations-CNN in Stage 2.",
+          "**GIS-Modul** (GeoPandas, Shapely, Rasterio, PyProj): Satellitenbild-Download und -Kachelung, UTM-Reprojektion, Pufferzonen-Berechnung, Intersection-Analyse und Risiko-Klassifizierung in Stage 3.",
+          "**Infrastruktur**: Docker-Compose-Setup mit NVIDIA-GPU-Support — browserbasiert, kein lokaler Installations-Aufwand."
+        ]
+      },
+
+      { "type": "heading", "level": 2, "text": "Die Lösung auf einen Blick" },
+      { "type": "image", "src": "/images/project-charta/workflow.png", "alt": "Workflow-Übersicht: Upload KML/GeoJSON → YOLOv8-Erkennung → ResNet-18-Verifikation → Risiko-Report" },
+      { "type": "paragraph", "text": "Der Ablauf besteht aus vier klar getrennten Stufen, die entweder als **Ein-Klick-Auto-Lauf** über die gesamte Trasse oder einzeln im **manuellen Modus** ausgeführt werden können. Jede Stufe liefert ein eigenes, inspizierbares Zwischenergebnis — das ist wichtig, weil die Genauigkeit der KI-Modelle pro Region und Bildqualität variiert und eine Nachkontrolle realistisch sein muss." },
+
+      { "type": "heading", "level": 2, "text": "Daten hochladen und sofort visualisieren" },
+      {
+        "type": "list",
+        "items": [
+          "**KML- und GeoJSON-Upload** per Drag & Drop — sofortige Darstellung der Trasse auf der Karte.",
+          "**Basemap-Wechsel** zwischen OpenStreetMap (geometrische Orientierung) und Esri-Satellitenbildern (Bildanalyse-Sicht).",
+          "**Zweisprachige UI** (Deutsch / Englisch), damit die Anwendung in unterschiedlichen Kontexten einsetzbar ist."
+        ]
+      },
+      {
+        "type": "imageRow",
+        "images": [
+          { "src": "/images/project-charta/basemap_osm.png", "alt": "Basemap — OpenStreetMap-Ansicht mit Pipeline-Linie" },
+          { "src": "/images/project-charta/basemap_satellite.png", "alt": "Basemap — Esri-Satellitenbild-Ansicht derselben Pipeline-Linie" }
+        ]
+      },
+
+      { "type": "heading", "level": 2, "text": "Analyse-Bereich eingrenzen und kacheln" },
+      { "type": "paragraph", "text": "Eine komplette Pipeline kann hunderte Kilometer lang sein — man will aber gezielt Abschnitte analysieren. Über ein **Rechteck-Tool** lässt sich der Analysebereich eingrenzen, und eine **Tiling-Vorschau** zeigt vorab exakt, welche Kacheln (Tile-Größe und Überlappung konfigurierbar) an die Pipeline geschickt werden. Das macht Kosten und Laufzeit planbar und vermeidet überflüssige Downloads." },
+      {
+        "type": "imageRow",
+        "images": [
+          { "src": "/images/project-charta/crop_selection.png", "alt": "Crop-Auswahl — Rechteck-Tool zur Eingrenzung des Analysebereichs auf dem Satellitenbild" },
+          { "src": "/images/project-charta/tiling_preview.png", "alt": "Tiling-Vorschau — Gitterraster zeigt, welche Kacheln analysiert werden" }
+        ]
+      },
+
+      { "type": "heading", "level": 2, "text": "Vierstufige KI-Pipeline" },
+      {
+        "type": "list",
+        "items": [
+          "**Stage 0 — Satellitenbild-Akquise:** Download der hochauflösenden Kacheln entlang der Trasse, Rasterio-basierte Georeferenzierung, Caching.",
+          "**Stage 1 — YOLOv8 Objekterkennung:** Zwei spezialisierte Modelle erkennen parallel **Gebäude** (Instance Segmentation) und **Bäume** (Instance Segmentation) auf jedem Kachelbild.",
+          "**Stage 2 — ResNet-18 Verifikation:** Ein zweites CNN mit 4-Kanal-Input (RGB + Mask) prüft jeden YOLO-Vorschlag und eliminiert False Positives klassenspezifisch.",
+          "**Stage 3 — Geometrische Risikoanalyse:** UTM-projizierte Abstandsberechnung zur Pipeline, Pufferzonen, Intersection-Flächen, Klassifizierung in Hoch / Mittel / Niedrig."
+        ]
+      },
+
+      { "type": "heading", "level": 2, "text": "Stage 1 — YOLOv8 Objekterkennung" },
+      {
+        "type": "imageRow",
+        "images": [
+          { "src": "/images/project-charta/metrics_buildings.png", "alt": "Qualitative und quantitative Metriken für die Gebäudeerkennung — Original, Ground Truth, Prediction, Error Map, Mask Comparison" },
+          { "src": "/images/project-charta/metrics_trees.png", "alt": "Qualitative und quantitative Metriken für die Baumerkennung — dieselbe Evaluationsmatrix wie bei Gebäuden" }
+        ]
+      },
+      { "type": "paragraph", "text": "Für **Gebäude** erreicht das angepasste Modell (`building_pretrained_whu`, YOLOv8) auf Box-Ebene eine Precision von 83,7 % bei 75,8 % Recall und einen mAP@50 von 82,7 %. Auf Patch-Level — also wenn einzelne Bildkacheln als Ganzes bewertet werden — liegt die F1-Metrik bei 0,978 bei einem IoU von 0,957. Das bedeutet: Wenn in einer Kachel ein Gebäude vorhanden ist, wird es praktisch immer gefunden und die Maskenkontur stimmt eng mit der Ground Truth überein." },
+      { "type": "paragraph", "text": "Die **Baumerkennung** (`tree_vanilla_yolov8m`) ist erwartbar schwieriger — Bäume haben unscharfe Grenzen, überlappen sich und variieren stark in Textur und Größe. Das Basismodell kommt auf Box-Precision 65,7 %, Recall 66,5 %, mAP@50 68,6 %. Entscheidend für eine Sicherheitsanwendung ist **Recall** — lieber ein falscher Alarm zu viel als ein übersehener Baum an der Pipeline — und genau diesen Hebel verschiebt Stage 2." },
+
+      { "type": "heading", "level": 2, "text": "Stage 2 — ResNet-18 Verifikation" },
+      { "type": "paragraph", "text": "Stage 1 ist auf hohen Recall getunt und liefert bewusst viele Kandidaten. Ein nachgeschaltetes **ResNet-18** mit **4-Kanal-Input** (RGB-Bild plus die von Stage 1 produzierte Segmentierungsmaske) entscheidet anschließend pro Objekt, ob der Vorschlag echt ist. Die Confidence-Schwelle lässt sich per Slider anpassen; Default-Werte sind 0,70 für Gebäude und 0,40 für Bäume." },
+      {
+        "type": "list",
+        "items": [
+          "**Gebäude — Stage 2**: Precision 81,8 %, Recall 95,9 %, F1 88,3 %, Accuracy 81,1 % (Threshold 0,70).",
+          "**Bäume — Stage 2**: Precision 83,6 %, Recall 87,8 %, F1 85,6 %, Accuracy 80,8 % (Threshold 0,40).",
+          "**Kombinierter Proposal-F1** nach beiden Stufen: **90,6 % für Gebäude** und **78,3 % für Bäume** — deutlich über dem Stage-1-only-Baseline."
+        ]
+      },
+      {
+        "type": "imageRow",
+        "images": [
+          { "src": "/images/project-charta/stage2_before.png", "alt": "Karte nach Stage 1 — viele Detektionen inklusive offensichtlicher False Positives" },
+          { "src": "/images/project-charta/stage2_after.png", "alt": "Karte nach Stage 2 — nur noch verifizierte Objekte, False Positives eliminiert" }
+        ]
+      },
+
+      { "type": "heading", "level": 2, "text": "Stage 3 — Geometrische Risikoanalyse" },
+      { "type": "image", "src": "/images/project-charta/risk_zones.png", "alt": "Farbcodierte Risikozonen auf der Karte — Rot für hohes Risiko, Orange für mittel, Grün für niedrig" },
+      { "type": "paragraph", "text": "Stage 3 übersetzt die pixelbasierten Detektionen in **georeferenzierte Risiken**. Alle Objekte werden in UTM-Zonen umprojiziert, damit Distanzen metrisch korrekt sind (nicht in Grad!). Um die Pipeline werden **konfigurierbare Pufferzonen** (z. B. 2 m / 5 m / 10 m) gelegt; pro Objekt wird berechnet, welche Zone es schneidet und wie weit der nächste Punkt von der Trasse entfernt ist. Bei Bäumen wird zusätzlich die **Stamm-Position** über den Masken-Centroid geschätzt, weil eine Krone deutlich breiter sein kann als der gefährdete Stamm." },
+      { "type": "paragraph", "text": "Das Ergebnis ist ein **Risiko-Label pro Objekt** (Hoch / Mittel / Niedrig) inklusive Schnittfläche mit der Schutzzone und Distanz in Metern — abrufbar per Klick auf die Karte, inkl. Confidence und Klasse." },
+
+      { "type": "heading", "level": 2, "text": "Interaktive Analyse, Layer-Kontrolle und Reports" },
+      {
+        "type": "imageRow",
+        "images": [
+          { "src": "/images/project-charta/feature_details.png", "alt": "Feature-Detail-Panel nach Klick auf ein erkanntes Objekt — zeigt Klasse, Distanz, Risk-Label und Confidence" },
+          { "src": "/images/project-charta/report_panel.png", "alt": "Report-Panel mit Run-Historie, Detection Counts, Confidence Insights und Risk Distribution" }
+        ]
+      },
+      {
+        "type": "list",
+        "items": [
+          "**Layer-Management** pro Stage: ein- und ausschalten, Farben und Transparenz anpassen, Confidence-Filter pro Layer.",
+          "**Auto- oder Manual-Modus** der Pipeline — Live-Progress-Timeline plus Prozess-Log für technische Details.",
+          "**Automatische Reports** mit Detection-Zählung, Confidence-Verteilung und Risiko-Histogramm.",
+          "**Export** als JSON, CSV oder komplettes ZIP-Paket — ein Run kann damit in eine andere Instanz importiert werden.",
+          "**Lokale Run-Historie** für Vergleiche zwischen Läufen mit unterschiedlichen Konfigurationen."
+        ]
+      },
+
+      { "type": "heading", "level": 2, "text": "Praxisbeispiel — Wasserleitung Mülheim an der Ruhr" },
+      { "type": "image", "src": "/images/project-charta/muelheim_example.png", "alt": "Realer Durchlauf: Wasserleitung im Raum Mülheim an der Ruhr mit farbcodierten Detektionen nach Auto-Pipeline" },
+      { "type": "paragraph", "text": "Als End-to-End-Validierung wurde die Anwendung auf einer echten Wasserleitungs-Trasse im Raum **Mülheim an der Ruhr** (reale Geometrie-Daten) gelaufen: Upload → Crop → Auto-Pipeline → Risiko-Report. Der komplette Durchlauf über den analysierten Trassenabschnitt benötigt auf der Entwicklungs-GPU wenige Minuten und liefert eine farbcodierte Karte mit allen Objekten, Risiko-Labels und exportierbarem Bericht — also exakt das, was im manuellen Prozess wochenlang dauern würde." },
+
+      { "type": "heading", "level": 2, "text": "Tech-Stack" },
+      {
+        "type": "list",
+        "items": [
+          "**Frontend:** React 19, Vite 6, Leaflet für die Kartendarstellung, Turf.js für clientseitige GIS-Operationen (Rechteck-Drawing, Intersection-Previews).",
+          "**Backend:** FastAPI (Python) als REST-/WebSocket-API, Celery mit Redis-Broker für die asynchrone Pipeline-Orchestrierung.",
+          "**ML:** PyTorch, YOLOv8 für Objekterkennung und Instance Segmentation, ResNet-18 als klassenspezifisches Verifikations-CNN mit 4-Kanal-Input.",
+          "**GIS:** GeoPandas, Shapely, Rasterio und PyProj für Reprojektion, Pufferzonen, Intersection und Distanzberechnungen.",
+          "**Infrastruktur:** Docker Compose mit NVIDIA-GPU-Support; Hardware-Mindestempfehlung 6 GB RAM, CUDA-GPU, 20 GB+ Speicher."
+        ]
+      },
+
+      { "type": "heading", "level": 2, "text": "Ergebnis & Einordnung" },
+      {
+        "type": "list",
+        "items": [
+          "**Ein vollständiges, end-to-end-funktionsfähiges System** — von der Satellitenbild-Akquise über zwei spezialisierte KI-Modelle bis zur georeferenzierten Risiko-Auswertung und zum exportierbaren Report.",
+          "**Alleine entwickelt** über Sommer und Herbst 2025 — als Full-Stack-Projekt mit Frontend, Backend, ML und GIS in einer einzigen, produktionsnahen Codebasis.",
+          "**Messbare KI-Qualität**: F1 > 85 % für Bäume und > 90 % für Gebäude nach beiden Detektions-Stufen; Recall explizit höher gewichtet als Precision, weil in einer Sicherheitsanwendung übersehene Objekte das größere Risiko sind.",
+          "**Reale End-to-End-Validierung** auf Mülheimer Trassendaten — nicht nur Benchmark-Zahlen, sondern ein vollständiger Durchlauf auf produktiv wirkender Geometrie."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "flugsim-geodesic-2024",
+    "title": "3D Flight Simulation on a Spherical Earth (Geodesic Path Calculation)",
+    "month": "2024-09",
+    "exactDate": "September 2024",
+    "location": "",
+    "image": "https://github.com/user-attachments/assets/2c1fe583-0ed8-4c33-be48-165be1588b34",
+    "shortDescription": "Entwicklung einer 3D-Flugsimulation, die realistische Flugrouten entlang geodätischer Linien (Großkreise) auf einer Kugel berechnet und visualisiert. Der Fokus lag auf mathematisch korrekter Routenberechnung sowie der Transformation von 3D-Koordinaten in eine visuelle 2D-Darstellung.",
+    "languages": ["Java"],
+    "tags": [
+      "3D-Mathematik",
+      "Vektorrechnung",
+      "Lineare Algebra",
+      "Geometrie",
+      "Geodäsie",
+      "Rendering (2D-Projektion)"
+    ],
+    "links": [
+      { "label": "Release v1", "url": "https://github.com/TutiEgg/FlugSim/releases/tag/v1" },
+      { "label": "Repository", "url": "https://github.com/TutiEgg/FlugSim" }
+    ],
+    "content": [
+      { "type": "heading", "level": 2, "text": "Vorgehensweise" },
+      { "type": "paragraph", "text": "Es wurden mathematische Formeln im 3D-Raum benutzt." },
+      { "type": "heading", "level": 3, "text": "Punkte auf der Kugel" },
+      { "type": "paragraph", "text": "Die Punkte auf der Kugel wurden mit Hilfe von geografischen Kugelkoordinaten und dem Radius berechnet." },
+      { "type": "image", "src": "https://github.com/user-attachments/assets/dfc024c8-4d80-4d52-8f88-fc487fa295fc", "alt": "Kugelkoordinaten und Punkte auf der Kugel" },
+      { "type": "heading", "level": 3, "text": "Winkelberechnung zwischen 2 Vektoren" },
+      { "type": "paragraph", "text": "Der Winkel wurde aus dem Skalarprodukt der Einheitsvektoren zu den jeweiligen Punkten berechnet." },
+      { "type": "image", "src": "https://github.com/user-attachments/assets/d0e28545-b59f-43c1-986d-72472dc96e9a", "alt": "Winkelberechnung über das Skalarprodukt" },
+      { "type": "heading", "level": 3, "text": "Großkreis" },
+      { "type": "paragraph", "text": "Für die Bestimmung des Großkreises wurde folgende Vorgehensweise benutzt:" },
+      { "type": "image", "src": "https://github.com/user-attachments/assets/a971b778-6d15-4a1d-89d4-bc84c8579855", "alt": "Vorgehensweise zur Bestimmung des Großkreises" },
+      { "type": "heading", "level": 4, "text": "Bestimmung der Drehmatrix" },
+      {
+        "type": "list",
+        "ordered": true,
+        "items": [
+          "Drehen des Einheitsvektors in X-Richtung auf den Einheitsvektor, der in Richtung des ersten Punktes zeigt",
+          "z auf Einheitsvektor n (n steht orthogonal auf beide Vektoren)",
+          "y auf Einheitsvektor u orthogonal zu n und p",
+          "Drehung des Vektors ⇒ Drehmatrix · Vektor",
+          "Drehmatrix [p u n]"
+        ]
+      },
+      { "type": "heading", "level": 4, "text": "Parameterformel Großkreis" },
+      { "type": "paragraph", "text": "Die Parameterformel des Großkreises lautet nun:" },
+      { "type": "image", "src": "https://github.com/user-attachments/assets/5395ae44-3724-455f-b251-598689c57a69", "alt": "Parameterformel des Großkreises" },
+      { "type": "paragraph", "text": "Wenn für t-Werte zwischen 0 und Theta eingesetzt werden, erhält man die jeweiligen Vektoren zu Punkten, die auf der Kurve auf dem Großkreis zwischen Start- und Endpunkt liegen. Diese beschreiben die Flugroute." },
+      { "type": "heading", "level": 3, "text": "Projektion von 3D auf 2D (Bildschirm)" },
+      { "type": "image", "src": "https://github.com/user-attachments/assets/1853045b-03b0-46c8-817f-52ecd3380e8c", "alt": "Projektion 3D nach 2D, Darstellung 1" },
+      { "type": "image", "src": "https://github.com/user-attachments/assets/b6b8dd2e-e6a0-4200-bac9-daabf1bb2886", "alt": "Projektion 3D nach 2D, Darstellung 2" },
+      { "type": "heading", "level": 4, "text": "Formel" },
+      { "type": "image", "src": "https://github.com/user-attachments/assets/ba825c97-2b31-4324-be11-54af434cf699", "alt": "Formel für die 2D-Projektion" },
+      { "type": "heading", "level": 3, "text": "Drahtgittermodell mit Umrissellipse" },
+      { "type": "paragraph", "text": "Das Drahtgittermodell wurde gemacht, indem Vektoren zu den Punkten, welche die Großkreise des Drahtgittermodells beschreiben, erzeugt und die jeweiligen Punkte gezeichnet wurden." },
+      { "type": "image", "src": "https://github.com/user-attachments/assets/2a5da67f-d753-4611-9d2f-0a9403ab538b", "alt": "Drahtgittermodell der Kugel" },
+      { "type": "heading", "level": 4, "text": "Umrissellipse" },
+      { "type": "image", "src": "https://github.com/user-attachments/assets/9b422fcc-204a-4e65-9dde-59c59a58c4f6", "alt": "Umrissellipse" }
+    ]
+  },
+  {
+    "id": "weather-forecasting-2024",
+    "title": "Deep Learning vs. Statistical Models for Time Series Forecasting",
+    "month": "2024-02",
+    "exactDate": "Februar 2024",
+    "location": "",
+    "image": "/images/weather/Datensatz_plot.PNG",
+    "shortDescription": "Vergleich verschiedener Modelle zur Vorhersage von Wetter-Zeitreihen, darunter klassische statistische Verfahren (SARIMA) und moderne Deep-Learning-Ansätze (LSTM, Transformer). Ziel war es, Unterschiede in Genauigkeit, Skalierbarkeit und Modellverhalten bei unterschiedlichen Zeitfrequenzen und Dateneigenschaften zu analysieren.",
+    "languages": ["Python"],
+    "tags": [
+      "TensorFlow / Keras",
+      "NumPy",
+      "Pandas",
+      "Matplotlib",
+      "SARIMA (statsmodels)",
+      "LSTM",
+      "Transformer",
+      "Time Series Analysis"
+    ],
+    "links": [],
+    "content": [
+      { "type": "heading", "level": 2, "text": "Einleitung" },
+      { "type": "paragraph", "text": "Wettervorhersagen basieren auf mathematischen Modellen der Atmosphäre und nutzen zunehmend Deep-Learning-Ansätze. Dieser Vergleich zielt darauf ab, verschiedene Modellarchitekturen wie LSTM und Transformer mit traditionellen Methoden wie SARIMA zu evaluieren." },
+
+      { "type": "heading", "level": 2, "text": "Verwendete Modelle" },
+      { "type": "paragraph", "text": "Die betrachteten Modelle umfassen:" },
+      {
+        "type": "list",
+        "items": [
+          "**SARIMA**: Ein klassisches Modell für stationäre Zeitreihen, das saisonale Effekte berücksichtigt.",
+          "**LSTM**: Ein rekurrentes neuronales Netzwerk, das langfristige Abhängigkeiten lernt und ideal für sequentielle Daten ist.",
+          "**Transformer**: Modelliert Abhängigkeiten effizient mit einem Attention-Mechanismus, was sich besonders für längere Sequenzen eignet."
+        ]
+      },
+
+      { "type": "heading", "level": 2, "text": "Datensatz und Datenvorverarbeitung" },
+      { "type": "image", "src": "/images/weather/Datensatz_plot.PNG", "alt": "Datensatz-Visualisierung" },
+      { "type": "paragraph", "text": "Der verwendete Datensatz, bereitgestellt vom Max-Planck-Institut, umfasst meteorologische Daten von 2009 bis 2016. Die Daten enthalten 14 Variablen, darunter Temperatur, Luftdruck und Windgeschwindigkeit, mit einer ursprünglichen Abtastrate von 10 Minuten. Der Datensatz wurde in stündliche Intervalle umgewandelt, und fehlerhafte Werte wurden bereinigt." },
+
+      { "type": "heading", "level": 3, "text": "Datenvorverarbeitungsschritte" },
+      {
+        "type": "list",
+        "ordered": true,
+        "items": [
+          "**Korrektur fehlerhafter Werte**: Werte wie -9999 bei Windgeschwindigkeit wurden auf 0.0 gesetzt.",
+          "**Umwandlung der Winddaten**: Windrichtung und -geschwindigkeit wurden in Vektoren umgewandelt, um Kontinuität zu gewährleisten.",
+          "**Normalisierung**: Die Daten wurden auf einen einheitlichen Wertebereich skaliert."
+        ]
+      },
+      {
+        "type": "imageRow",
+        "images": [
+          { "src": "/images/weather/Wind_1.PNG", "alt": "Winddaten, Darstellung 1" },
+          { "src": "/images/weather/Wind_2.PNG", "alt": "Winddaten, Darstellung 2" }
+        ]
+      },
+
+      { "type": "heading", "level": 2, "text": "Modelle und Methodik" },
+
+      { "type": "heading", "level": 3, "text": "SARIMA-Modell" },
+      { "type": "paragraph", "text": "Das SARIMA-Modell nutzt saisonale und nicht-saisonale Parameter zur Modellierung der Zeitreihe. Der Augmented Dickey-Fuller-Test wurde zur Sicherstellung der Stationarität der Daten angewandt. Eine Vielzahl an Modellkonfigurationen wurde getestet, um die besten Parameter mittels Akaike-Informationskriterium (AIC) zu identifizieren." },
+      {
+        "type": "imageRow",
+        "images": [
+          { "src": "/images/weather/PACF_6h.PNG", "alt": "PACF 6h" },
+          { "src": "/images/weather/PACF_month.PNG", "alt": "PACF Monat" },
+          { "src": "/images/weather/Frequenzen.PNG", "alt": "Frequenzen" }
+        ]
+      },
+
+      { "type": "heading", "level": 3, "text": "LSTM-Modell" },
+      { "type": "paragraph", "text": "Das LSTM-Modell besteht aus einer LSTM-Schicht und einer voll verbundenen Schicht für die Ausgabe. Die Eingabedaten wurden mit einem „WindowGenerator“ vorstrukturiert, der Eingabefenster für historische Daten und die Zielwerte für Vorhersagen erstellt." },
+
+      { "type": "heading", "level": 3, "text": "Transformer-Modell" },
+      { "type": "paragraph", "text": "Das Transformer-Modell nutzt eine Encoder-Decoder-Architektur mit einer Maskierungsfunktion, die sicherstellt, dass nur vergangene Daten zur Vorhersage herangezogen werden. Die Daten werden durch ein Sliding-Window-Verfahren strukturiert und in 16-dimensionale Embeddings überführt." },
+
+      { "type": "heading", "level": 2, "text": "Ergebnisse" },
+      { "type": "paragraph", "text": "Die Ergebnisse zeigen deutliche Unterschiede in der Genauigkeit und der Effizienz der Modelle:" },
+      {
+        "type": "list",
+        "items": [
+          "**SARIMA**: Liefert schnelle und zuverlässige Vorhersagen für stationäre Zeitreihen.",
+          "**LSTM**: Geeignet für größere, nicht-stationäre Datensätze; benötigt jedoch mehr Zeit für das Training.",
+          "**Transformer**: Zeigt besonders bei langen Zeitreihen hohe Genauigkeit, profitiert von Attention-Mechanismen für komplexe Muster."
+        ]
+      },
+
+      { "type": "heading", "level": 2, "text": "Diskussion" },
+      {
+        "type": "list",
+        "items": [
+          "**Frequenzabhängigkeit und Modellkomplexität**: Die Wahl der Datenfrequenz (z. B. 6-stündlich oder täglich) beeinflusst die Genauigkeit der Modelle. Insbesondere bei kürzeren Frequenzen zeigt SARIMA eine höhere Effizienz und erreicht gute Vorhersagegenauigkeiten mit stabilen saisonalen Mustern. Bei täglichen Daten sinkt jedoch die Genauigkeit, was auf die Schwierigkeiten hinweist, langzeitliche Abhängigkeiten zu modellieren. Transformer- und LSTM-Modelle erwiesen sich bei kurzen Frequenzen als besser geeignet.",
+          "**Saisonalitätsparameter**: SARIMA-Modelle reagieren empfindlich auf die Wahl der Saisonalitätsparameter, die das Modell in einigen Fällen zu Overfitting neigen lässt, besonders wenn eine zu lange Periodizität angenommen wird. Bei der Verwendung saisonaler Komponenten mit Frequenzen von über zwölf Monaten liefern die Modelle keine zusätzlichen Erkenntnisse, da saisonale Muster jenseits eines Jahres nicht signifikant nachgewiesen wurden.",
+          "**Input-Dimension und Modellleistung**: Für die Deep-Learning-Modelle, insbesondere Transformer, konnte durch Reduzierung der Input-Dimension eine Leistungssteigerung erzielt werden. Eine geringere Anzahl von Features führte zu einer geringeren Modellkomplexität und gleichzeitig zu verbesserten Fehlermaßen (z. B. MAE, MSE, Smape), was die Bedeutung einer sorgfältigen Feature-Auswahl bei der Modellierung unterstreicht.",
+          "**Verlustfunktion und Modellleistung**: Bei LSTM-Modellen beeinflusst die Wahl der Verlustfunktion (MSE vs. Smape) die Modellleistung. Smape führte in den meisten Fällen zu besseren Ergebnissen, was darauf hinweist, dass die Verlustfunktion basierend auf den Vorhersagezielen und der Art der Daten sorgfältig gewählt werden sollte.",
+          "**Regularisierung und Konzeptdrift im Transformer-Modell**: Die Anwendung von Dropout führte zu Schwankungen in den Trainingsläufen, und das Sliding-Window-Verfahren zeigte, dass unterschiedliche Positionen des Fensters verschiedene Aspekte der zugrunde liegenden Muster betonen. Ein gezieltes Preprocessing und eine bessere Regularisierung könnten diese Abweichungen reduzieren."
+        ]
+      },
+
+      { "type": "heading", "level": 2, "text": "Herausforderungen" },
+      { "type": "paragraph", "text": "Während des Projekts traten folgende Herausforderungen auf:" },
+      {
+        "type": "list",
+        "items": [
+          "**Fehlerhafte und fehlende Daten**: Daten mussten manuell korrigiert werden, um fehlerhafte Werte wie -9999 zu bereinigen. Dieser Prozess war notwendig, um die Integrität der Daten zu gewährleisten und deren Einfluss auf die Modellgenauigkeit zu minimieren.",
+          "**Überanpassung bei Deep-Learning-Modellen**: Besonders Transformer neigten dazu, die Trainingsdaten zu überanpassen. Techniken wie Dropout und Early Stopping wurden eingesetzt, um das Modell zu regulieren.",
+          "**Hyperparameteroptimierung**: Die Auswahl der besten Hyperparameter war zeitaufwendig und erforderte umfangreiche Tests. Insbesondere die Festlegung der Epochenzahl und die Batchgröße beeinflussten die Effizienz und Genauigkeit der Modelle.",
+          "**Komplexität der Transformermodelle**: Die Transformer-Modelle waren speicherintensiv und erforderten spezifische Konfigurationen der Eingabedimensionen und History Size, um präzise Vorhersagen zu erzielen.",
+          "**Berechnungskapazitäten**: Die benötigten Rechenressourcen für die Deep-Learning-Modelle waren hoch. Insbesondere Transformer und LSTM erforderten deutlich mehr Kapazität als SARIMA."
+        ]
+      },
+
+      { "type": "heading", "level": 2, "text": "Fazit" },
+      { "type": "paragraph", "text": "Die Ergebnisse dieses Projekts zeigen, dass die Wahl des Modells stark von der Art der Zeitreihe abhängt:" },
+      {
+        "type": "list",
+        "items": [
+          "**SARIMA**: Effizient für schnelle Vorhersagen bei stationären Daten.",
+          "**LSTM**: Eignet sich für nicht-stationäre Zeitreihen und zeigt bei großen Datensätzen gute Leistungen.",
+          "**Transformer**: Ideal für komplexe, saisonale Muster in großen Datenmengen."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "signal-processing-gui-2023",
+    "title": "Modulare GUI für Signalverarbeitung und Daten-Preprocessing",
+    "month": "2023-10",
+    "exactDate": "Oktober 2023",
+    "location": "",
+    "image": "/images/gui/MAIN.PNG",
+    "shortDescription": "Entwicklung einer modularen Desktop-Anwendung zur Visualisierung, Bearbeitung und Transformation von Zeitreihensignalen. Die GUI ermöglicht das flexible Kombinieren von Preprocessing-Schritten über eine Drag-and-Drop-Pipeline sowie die dynamische Parametrisierung von Signalverarbeitungsfunktionen.",
+    "languages": ["Python"],
+    "tags": [
+      "PySide2 (Qt)",
+      "Bokeh",
+      "NumPy",
+      "Signal Processing",
+      "GUI-Design",
+      "Drag-and-Drop"
+    ],
+    "links": [
+      { "label": "Repository", "url": "https://github.com/TutiEgg/GUI" }
+    ],
+    "content": [
+      { "type": "heading", "level": 2, "text": "Main-Fenster" },
+      { "type": "paragraph", "text": "Die Anwendung lässt sich durch das Ausführen der **main.py** starten." },
+      { "type": "image", "src": "/images/gui/MAIN.PNG", "alt": "Hauptfenster der GUI" },
+
+      { "type": "heading", "level": 3, "text": "Funktionalitäten des Hauptfensters" },
+      {
+        "type": "list",
+        "items": [
+          "Auf der linken Seite wird beim erstmaligen Starten die Möglichkeiten von Bokeh angezeigt, welche beim erstmaligen Importieren/Generieren von Signalen überschrieben werden.",
+          "Oben rechts werden alle importierten Signale in einer Liste angezeigt. Über den Import-Button lassen sich Signale hinzufügen; einzelne Einträge können ein-/ausgeblendet oder gelöscht werden."
+        ]
+      },
+      { "type": "image", "src": "/images/gui/list_import.PNG", "alt": "Liste der importierten Signale" },
+      {
+        "type": "list",
+        "items": [
+          "Unten rechts werden alle bearbeiteten Signale angezeigt. Per Checkbox werden sie für den Export ausgewählt, der Export-Button exportiert alle markierten Signale.",
+          "Die Navigation auf der linken Seite funktioniert bereits; die beiden weiteren Seiten (manuelles Schneiden und allgemeine Visualisierung) sind für die Zukunft vorgesehen."
+        ]
+      },
+      { "type": "image", "src": "/images/gui/list_export.PNG", "alt": "Liste der bearbeiteten Signale für den Export" },
+
+      { "type": "heading", "level": 2, "text": "Settings-Fenster" },
+      { "type": "paragraph", "text": "Dieses Fenster lässt sich durch das Klicken des „Zahnrad\"-Symbols auf der Haupt-GUI öffnen und enthält alle Einstellungen sowie die Auswahl an Filter- und Transformations-Funktionen." },
+      { "type": "image", "src": "/images/gui/settings_window.PNG", "alt": "Settings-Fenster mit Filter- und Transformations-Funktionen" },
+
+      { "type": "heading", "level": 3, "text": "Funktionalitäten des Settings-Fensters" },
+      {
+        "type": "list",
+        "items": [
+          "Auf der rechten Seite sind alle verfügbaren Vorverarbeitungsfunktionen aufgelistet; per Add-Button werden sie in die Pipeline eingefügt.",
+          "Eingefügte Funktionen lassen sich über das „Zahnrad\"-Symbol individuell parametrisieren (aktuell müssen die eingegebenen Werte valide sein, da GUI-seitig noch keine Fehlermeldungen gecatcht werden).",
+          "Alle ausgewählten Operationen sind per **Drag-and-Drop** neu anordenbar — die Reihenfolge in der Liste entspricht der Reihenfolge der Funktionsaufrufe."
+        ]
+      },
+
+      { "type": "heading", "level": 2, "text": "Parameter-Settings-Fenster" },
+      { "type": "paragraph", "text": "Dieses Fenster ermöglicht es, spezifische Parameter an die ausgewählten Funktionen zu übergeben. Es wird **automatisch anhand der Parameter-Annotationen** der Funktion erstellt." },
+      { "type": "image", "src": "/images/gui/parameter_settings_window.PNG", "alt": "Parameter-Settings-Fenster" },
+
+      { "type": "heading", "level": 3, "text": "Funktionalitäten des Parameter-Settings-Fensters" },
+      {
+        "type": "list",
+        "items": [
+          "Einstellen der Parameter einer ausgewählten Funktion.",
+          "Einstellungen müssen über den „Save Settings\"-Button persistiert werden."
+        ]
+      },
+
+      { "type": "heading", "level": 2, "text": "Zu beachten" },
+      {
+        "type": "list",
+        "items": [
+          "Auf Fehler bei Eingaben wurde noch nicht geachtet — bei falscher Parameter-Eingabe können Exceptions auftreten, die aktuell nicht gecatcht werden.",
+          "Der „Reset List\"-Button im Settings-Fenster ist noch nicht funktional.",
+          "Der Funktionsname wird im Parameter-Settings-Fenster noch nicht angezeigt (aktuell nur „TextLabel\").",
+          "Alle Dateien mit Suffix `ui` sind vom Qt-Designer generiert und werden mittels PySide2 in Python-Dateien umgewandelt — daher viele `ui`-Dateien mit gleichem Basisnamen.",
+          "Wenn ein Signal mehrere Achsen aufweist, wird momentan nur die X-Achse verwendet."
+        ]
+      },
+
+      { "type": "heading", "level": 2, "text": "Geplante Erweiterungen" },
+      {
+        "type": "list",
+        "items": [
+          "**Docstrings** aus den Funktionen sollen als Hilfstexte im Parameter-Settings-Fenster angezeigt werden.",
+          "Die zwei weiteren Seiten im Hauptfenster (**manuelles Schneiden** und **allgemeine Visualisierung**) sollen implementiert werden.",
+          "Namen bearbeiteter Signale werden aktuell nur über einen Timestamp eindeutig gemacht — künftig zusätzlich über die gesetzten Parameter.",
+          "Parameter-Eingabebereiche sollen funktionsspezifisch aus Annotationen abgeleitet und validiert werden.",
+          "Alle Fehler sollen gecatcht und in einer **Error-GUI** mit ausführlicher Meldung dargestellt werden.",
+          "Import verschiedener Dateiformate und zusätzlicher Datentypen (z. B. Bildserien aus **ToF**-Sensoren)."
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,336 @@
+.section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-12) var(--space-6) var(--space-16);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: var(--space-12);
+}
+
+.eyebrow {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin: 0 0 var(--space-3);
+}
+
+.heading {
+  font-size: var(--text-4xl);
+  margin: 0 0 var(--space-3);
+  background: linear-gradient(135deg, var(--color-text) 0%, var(--color-accent-hover) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.subheading {
+  color: var(--color-text-muted);
+  max-width: 620px;
+  margin: 0 auto;
+  font-size: var(--text-lg);
+}
+
+/* --- List & item wrapper -------------------------------------------------- */
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-6);
+}
+
+.item {
+  display: block;
+}
+
+/* --- Card ----------------------------------------------------------------- */
+
+.card {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(180px, 220px) 1fr;
+  gap: var(--space-8);
+  align-items: center;
+  padding: var(--space-8);
+  border-radius: var(--radius-xl);
+  background:
+    linear-gradient(135deg, rgba(139, 124, 246, 0.05), rgba(34, 211, 238, 0.03)) padding-box,
+    linear-gradient(135deg, rgba(139, 124, 246, 0.45), rgba(251, 191, 36, 0.25)) border-box;
+  border: 1px solid transparent;
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(8px);
+  transition: transform 0.4s var(--ease-out), box-shadow 0.4s var(--ease-out),
+    border-color 0.4s var(--ease-out);
+  overflow: hidden;
+  outline: none;
+}
+
+.card::before {
+  /* Ambient gradient glow on hover */
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at var(--mx, 30%) var(--my, 40%),
+    rgba(139, 124, 246, 0.22) 0%,
+    transparent 55%
+  );
+  opacity: 0;
+  transition: opacity 0.5s var(--ease-out);
+}
+
+.card::after {
+  /* Decorative accent bar on the left edge */
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 12%;
+  bottom: 12%;
+  width: 3px;
+  background: linear-gradient(180deg, var(--color-accent) 0%, #fbbf24 100%);
+  border-radius: 0 var(--radius-full) var(--radius-full) 0;
+  opacity: 0.6;
+  transition: opacity 0.4s var(--ease-out), transform 0.4s var(--ease-out);
+}
+
+.card:hover,
+.card:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+}
+
+.card:hover::before,
+.card:focus-visible::before {
+  opacity: 1;
+}
+
+.card:hover::after,
+.card:focus-visible::after {
+  opacity: 1;
+  transform: scaleY(1.08);
+}
+
+/* --- Graduation cap ------------------------------------------------------- */
+
+.capWrap {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 12px 24px rgba(139, 124, 246, 0.35));
+  will-change: transform;
+}
+
+.capGlow {
+  position: absolute;
+  inset: -25%;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(
+    circle,
+    rgba(251, 191, 36, 0.35) 0%,
+    rgba(139, 124, 246, 0.25) 45%,
+    transparent 70%
+  );
+  filter: blur(14px);
+  z-index: 0;
+}
+
+.capSvg {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+}
+
+/* --- Hover-only overlays (shine sweep + sparkles) ------------------------- */
+
+.shine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 45%;
+  pointer-events: none;
+  background: linear-gradient(
+    110deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0) 30%,
+    rgba(251, 191, 36, 0.12) 50%,
+    rgba(255, 255, 255, 0) 70%,
+    transparent 100%
+  );
+  transform: skewX(-18deg);
+  z-index: 2;
+}
+
+.sparkles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.sparkle {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    #fef3c7 0%,
+    rgba(251, 191, 36, 0.85) 40%,
+    transparent 70%
+  );
+  box-shadow: 0 0 8px rgba(251, 191, 36, 0.8);
+  transform-origin: center;
+}
+
+/* --- Body ----------------------------------------------------------------- */
+
+.body {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.metaDot {
+  color: var(--color-text-subtle);
+}
+
+.location {
+  color: var(--color-text-muted);
+  letter-spacing: 0.1em;
+}
+
+.degree {
+  font-size: var(--text-2xl);
+  line-height: 1.25;
+  color: var(--color-text);
+}
+
+.subject {
+  color: var(--color-accent-hover);
+  font-weight: 600;
+}
+
+.institution {
+  color: var(--color-text-muted);
+  font-weight: 500;
+  font-size: var(--text-base);
+}
+
+.summary {
+  color: var(--color-text-muted);
+  font-size: var(--text-base);
+  line-height: 1.7;
+}
+
+/* --- Highlights ----------------------------------------------------------- */
+
+.highlights {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-2) 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.highlight {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-hover);
+  border: 1px solid rgba(139, 124, 246, 0.25);
+  transition: transform 0.25s var(--ease-out), border-color 0.25s var(--ease-out),
+    background 0.25s var(--ease-out);
+}
+
+.card:hover .highlight {
+  border-color: rgba(139, 124, 246, 0.4);
+}
+
+.highlight:hover {
+  transform: translateY(-2px);
+  background: rgba(139, 124, 246, 0.22);
+}
+
+/* --- Link ----------------------------------------------------------------- */
+
+.link {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+.link:hover {
+  color: var(--color-accent-hover);
+}
+
+/* --- Responsive ----------------------------------------------------------- */
+
+@media (max-width: 768px) {
+  .section {
+    padding: var(--space-8) var(--space-4) var(--space-12);
+  }
+
+  .heading {
+    font-size: var(--text-3xl);
+  }
+
+  .card {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+    padding: var(--space-6);
+    text-align: center;
+  }
+
+  .capWrap {
+    max-width: 160px;
+    margin: 0 auto;
+  }
+
+  .meta,
+  .highlights {
+    justify-content: center;
+  }
+
+  .link {
+    align-self: center;
+  }
+
+  .card::after {
+    display: none;
+  }
+}

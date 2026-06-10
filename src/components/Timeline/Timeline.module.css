@@ -1,0 +1,109 @@
+.timeline {
+  position: relative;
+  padding: var(--space-24) var(--space-8) var(--space-24);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: var(--space-24);
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: var(--color-accent);
+  margin-bottom: var(--space-3);
+}
+
+.heading {
+  font-size: var(--text-4xl);
+  background: linear-gradient(
+    120deg,
+    var(--color-text) 0%,
+    var(--color-accent) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: var(--space-4);
+}
+
+.subheading {
+  font-size: var(--text-lg);
+  color: var(--color-text-muted);
+  max-width: 540px;
+  margin: 0 auto;
+}
+
+.track {
+  position: relative;
+}
+
+.trackLine,
+.trackProgress {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  transform-origin: top center;
+  pointer-events: none;
+}
+
+.trackLine {
+  transform: translateX(-50%);
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    var(--color-border-strong) 10%,
+    var(--color-border-strong) 90%,
+    transparent 100%
+  );
+}
+
+.trackProgress {
+  transform: translateX(-50%) scaleY(0);
+  background: linear-gradient(
+    to bottom,
+    var(--color-accent) 0%,
+    var(--color-secondary) 100%
+  );
+  box-shadow: 0 0 12px var(--color-accent-glow);
+}
+
+.items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-24);
+}
+
+@media (max-width: 900px) {
+  .timeline {
+    padding: var(--space-16) var(--space-6);
+  }
+
+  .trackLine,
+  .trackProgress {
+    left: 24px;
+    transform: none;
+  }
+
+  .trackProgress {
+    transform: scaleY(0);
+  }
+
+  .items {
+    gap: var(--space-16);
+  }
+
+  .heading {
+    font-size: var(--text-3xl);
+  }
+}

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <defs>
+    <linearGradient id="bg3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7c2d12"/>
+      <stop offset="100%" stop-color="#431407"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg3)"/>
+  <g fill="none" stroke="#fb923c" stroke-width="3">
+    <rect x="180" y="140" width="180" height="140" rx="6"/>
+    <rect x="420" y="140" width="180" height="140" rx="6"/>
+    <rect x="180" y="320" width="180" height="140" rx="6"/>
+    <rect x="420" y="320" width="180" height="140" rx="6"/>
+  </g>
+  <g fill="#fb923c">
+    <text x="270" y="215" text-anchor="middle" font-family="monospace" font-size="14">OK</text>
+    <text x="510" y="215" text-anchor="middle" font-family="monospace" font-size="14">OK</text>
+    <text x="270" y="395" text-anchor="middle" font-family="monospace" font-size="14">OK</text>
+  </g>
+  <g stroke="#ef4444" stroke-width="4" fill="none">
+    <line x1="440" y1="340" x2="580" y2="440"/>
+    <line x1="580" y1="340" x2="440" y2="440"/>
+  </g>
+  <text x="400" y="540" text-anchor="middle" font-family="monospace" font-size="22" fill="#fdba74">defect detection</text>
+</svg>

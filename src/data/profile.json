@@ -1,0 +1,14 @@
+{
+  "name": "Luca Moser",
+  "role": "Machine Learning Specialist",
+  "tagline": "Ich baue Machine-Learning-Systeme vom Prototyp bis zur Produktion.",
+  "bio": "Medieninformatiker (B.Sc., Hochschule Furtwangen) mit Fokus auf Machine Learning und KI-gestützte Software. Aktuell arbeite ich als Machine Learning Specialist. Zuvor war ich als Werkstudent im Data-Science- und Software-Entwicklungs-Umfeld tätig, mit Schwerpunkt auf KI-Anwendungen.",
+  "photo": "/images/profile.jpg",
+  "email": "mmlpv.moser@gmx.de",
+  "location": "Deutschland / Schweiz",
+  "socials": [
+    { "label": "GitHub", "url": "https://github.com/TutiEgg", "icon": "github" },
+    { "label": "LinkedIn", "url": "https://linkedin.com/in/yourname", "icon": "linkedin" },
+    { "label": "Email", "url": "mailto:mmlpv.moser@gmx.de", "icon": "mail" }
+  ]
+}
