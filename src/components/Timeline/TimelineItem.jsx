@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
+import { assetPath } from '../../utils/assetPath.js';
 import { parseMonth } from '../../utils/formatMonth.js';
 import { TechStackTags } from '../TechStackTags/TechStackTags.jsx';
 import styles from './TimelineItem.module.css';
@@ -55,6 +56,7 @@ export function TimelineItem({
   }, [index, registerRef]);
 
   const [year, monthShort] = parseMonth(project.month);
+  const projectImage = assetPath(project.image);
 
   return (
     <motion.li
@@ -68,7 +70,7 @@ export function TimelineItem({
       {/* Blurred full-bleed project image backdrop */}
       <motion.div
         className={styles.backdrop}
-        style={{ backgroundImage: `url(${project.image})` }}
+        style={{ backgroundImage: `url(${projectImage})` }}
         aria-hidden="true"
         initial={{ opacity: 0 }}
         animate={{ opacity: expanded ? 0.35 : 0 }}
@@ -132,7 +134,7 @@ export function TimelineItem({
           transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
         >
           <img
-            src={project.image}
+            src={projectImage}
             alt={project.title}
             className={styles.image}
             loading="lazy"

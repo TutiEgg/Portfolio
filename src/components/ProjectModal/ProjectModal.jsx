@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useLockBodyScroll } from '../../hooks/useLockBodyScroll.js';
+import { assetPath } from '../../utils/assetPath.js';
 import { TechStackTags } from '../TechStackTags/TechStackTags.jsx';
 import { ProjectContent } from './ProjectContent.jsx';
 import styles from './ProjectModal.module.css';
@@ -36,6 +37,7 @@ const dialogVariants = {
 
 export function ProjectModal({ project, onClose }) {
   const isOpen = Boolean(project);
+  const projectImage = assetPath(project?.image);
   useLockBodyScroll(isOpen);
 
   const handleKeyDown = useCallback(
@@ -97,7 +99,7 @@ export function ProjectModal({ project, onClose }) {
 
             <div
               className={styles.hero}
-              style={{ backgroundImage: `url(${project.image})` }}
+              style={{ backgroundImage: `url(${projectImage})` }}
               aria-hidden="true"
             >
               <div className={styles.heroOverlay} />
@@ -148,13 +150,13 @@ export function ProjectModal({ project, onClose }) {
                         {project.gallery.map((src, index) => (
                           <li key={src} className={styles.galleryItem}>
                             <a
-                              href={src}
+                              href={assetPath(src)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className={styles.galleryLink}
                             >
                               <img
-                                src={src}
+                                src={assetPath(src)}
                                 alt={`${project.title} — Abbildung ${index + 1}`}
                                 className={styles.galleryImage}
                                 loading="lazy"

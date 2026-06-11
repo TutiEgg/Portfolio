@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { assetPath } from '../../utils/assetPath.js';
 import { SocialIcon } from '../icons/SocialIcon.jsx';
 import styles from './Hero.module.css';
 
@@ -51,7 +52,11 @@ export function Hero({ profile, onScrollToTimeline }) {
           transition={{ type: 'spring', stiffness: 200, damping: 18 }}
         >
           <div className={styles.photoGlow} aria-hidden="true" />
-          <img src={photo} alt={`Portrait of ${name}`} className={styles.photo} />
+          <img
+            src={assetPath(photo)}
+            alt={`Portrait of ${name}`}
+            className={styles.photo}
+          />
         </motion.div>
 
         <div className={styles.content}>

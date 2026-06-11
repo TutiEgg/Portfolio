@@ -1,3 +1,4 @@
+import { assetPath } from '../../utils/assetPath.js';
 import styles from './ProjectModal.module.css';
 
 const HEADING_MAP = {
@@ -34,15 +35,17 @@ function renderInline(text) {
 }
 
 function Figure({ src, alt, className = '' }) {
+  const resolvedSrc = assetPath(src);
+
   return (
     <a
-      href={src}
+      href={resolvedSrc}
       target="_blank"
       rel="noopener noreferrer"
       className={`${styles.figureLink} ${className}`.trim()}
     >
       <img
-        src={src}
+        src={resolvedSrc}
         alt={alt}
         className={styles.inlineImage}
         loading="lazy"
