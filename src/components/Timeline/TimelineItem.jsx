@@ -29,6 +29,25 @@ const dateVariants = {
   },
 };
 
+const CASE_STATS = {
+  'silgentas-2026': ['SAC · 0 kWh ENS', '§14a / BSI', 'CNN-BiLSTM'],
+  'rilkosan-2026': ['100k Frames', '4 Layers', 'EtherCAT IDS'],
+  'project-charta-2025': ['YOLOv8', 'GIS Pipeline', 'Risk Scoring'],
+  'flugsim-geodesic-2024': ['3D Math', 'Geodesics', 'Java'],
+  'weather-forecasting-2024': ['LSTM', 'Transformer', 'SARIMA'],
+  'signal-processing-gui-2023': ['PySide2', 'Bokeh', 'Signal Tools'],
+};
+
+function getCaseStats(project) {
+  return (
+    CASE_STATS[project.id] ?? [
+      project.languages?.[0],
+      project.tags?.[0],
+      project.tags?.[1],
+    ]
+  ).filter(Boolean);
+}
+
 export function TimelineItem({
   index,
   project,
@@ -57,6 +76,7 @@ export function TimelineItem({
 
   const [year, monthShort] = parseMonth(project.month);
   const projectImage = assetPath(project.image);
+  const caseStats = getCaseStats(project);
 
   return (
     <motion.li
@@ -124,7 +144,11 @@ export function TimelineItem({
         custom={side}
         initial="hidden"
         animate={expanded ? 'visible' : 'hidden'}
-        whileHover={{ y: -6 }}
+        whileHover={{
+          y: -8,
+          rotateX: 1.2,
+          rotateY: side === 'left' ? -1.4 : 1.4,
+        }}
         transition={{ type: 'spring', stiffness: 180, damping: 22 }}
       >
         <motion.div
@@ -141,6 +165,14 @@ export function TimelineItem({
           />
           <div className={styles.imageGlow} aria-hidden="true" />
         </motion.div>
+
+        {caseStats.length > 0 && (
+          <ul className={styles.caseStats} aria-label="Projekt-Kennzahlen">
+            {caseStats.slice(0, 3).map((stat) => (
+              <li key={stat}>{stat}</li>
+            ))}
+          </ul>
+        )}
 
         <motion.div
           className={styles.body}

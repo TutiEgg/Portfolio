@@ -7,6 +7,18 @@ const HEADING_MAP = {
   4: 'h5',
 };
 
+export function sectionAnchorId(text, index) {
+  const slug = String(text ?? '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 48);
+
+  return `section-${index}-${slug || 'details'}`;
+}
+
 /**
  * Renders README-style interleaved content blocks. Supported block types:
  *  - heading   ({ level: 2..4, text })
@@ -34,14 +46,14 @@ function renderInline(text) {
   );
 }
 
-function Figure({ src, alt, className = '' }) {
+function Figure({ src, alt, className = '', onImageOpen }) {
   const resolvedSrc = assetPath(src);
 
   return (
-    <a
-      href={resolvedSrc}
-      target="_blank"
-      rel="noopener noreferrer"
+    <button
+      type="button"
+      onClick={() => onImageOpen?.({ src: resolvedSrc, alt })}
+      aria-label={`Bild öffnen: ${alt}`}
       className={`${styles.figureLink} ${className}`.trim()}
     >
       <img
@@ -50,11 +62,11 @@ function Figure({ src, alt, className = '' }) {
         className={styles.inlineImage}
         loading="lazy"
       />
-    </a>
+    </button>
   );
 }
 
-export function ProjectContent({ blocks, title }) {
+export function ProjectContent({ blocks, title, onImageOpen }) {
   if (!blocks?.length) return null;
 
   return (
@@ -66,8 +78,15 @@ export function ProjectContent({ blocks, title }) {
           const level = block.level >= 2 && block.level <= 4 ? block.level : 3;
           const Tag = HEADING_MAP[level];
           const headingClass = styles[`articleMd${level}`];
+          const sectionIndex = blocks
+            .slice(0, index)
+            .filter((item) => item.type === 'heading' && item.level === 2)
+            .length;
+          const headingId =
+            level === 2 ? sectionAnchorId(block.text, sectionIndex) : undefined;
+
           return (
-            <Tag key={key} className={headingClass}>
+            <Tag key={key} id={headingId} className={headingClass}>
               {block.text}
             </Tag>
           );
@@ -103,7 +122,7 @@ export function ProjectContent({ blocks, title }) {
           const alt = block.alt || `${title} — Abbildung ${index + 1}`;
           return (
             <figure key={key} className={styles.figure}>
-              <Figure src={block.src} alt={alt} />
+              <Figure src={block.src} alt={alt} onImageOpen={onImageOpen} />
             </figure>
           );
         }
@@ -125,6 +144,7 @@ export function ProjectContent({ blocks, title }) {
                 <figure key={i} className={styles.figure}>
                   <Figure
                     src={img.src}
+                    onImageOpen={onImageOpen}
                     alt={img.alt || `${title} — Abbildung ${index + 1}.${i + 1}`}
                   />
                 </figure>

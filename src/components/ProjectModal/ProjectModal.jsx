@@ -1,9 +1,9 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useLockBodyScroll } from '../../hooks/useLockBodyScroll.js';
 import { assetPath } from '../../utils/assetPath.js';
 import { TechStackTags } from '../TechStackTags/TechStackTags.jsx';
-import { ProjectContent } from './ProjectContent.jsx';
+import { ProjectContent, sectionAnchorId } from './ProjectContent.jsx';
 import styles from './ProjectModal.module.css';
 
 /**
@@ -38,13 +38,35 @@ const dialogVariants = {
 export function ProjectModal({ project, onClose }) {
   const isOpen = Boolean(project);
   const projectImage = assetPath(project?.image);
+  const [lightboxImage, setLightboxImage] = useState(null);
   useLockBodyScroll(isOpen);
+
+  const sections = useMemo(() => {
+    if (!project?.content?.length) return [];
+    let sectionIndex = 0;
+    return project.content
+      .filter((block) => block.type === 'heading' && block.level === 2)
+      .map((block) => ({
+        id: sectionAnchorId(block.text, sectionIndex++),
+        label: block.text,
+      }));
+  }, [project]);
+
+  const openLightbox = useCallback((image) => {
+    setLightboxImage(image);
+  }, []);
+
+  const closeLightbox = useCallback(() => {
+    setLightboxImage(null);
+  }, []);
 
   const handleKeyDown = useCallback(
     (event) => {
-      if (event.key === 'Escape') onClose();
+      if (event.key !== 'Escape') return;
+      if (lightboxImage) closeLightbox();
+      else onClose();
     },
-    [onClose]
+    [closeLightbox, lightboxImage, onClose]
   );
 
   useEffect(() => {
@@ -52,6 +74,10 @@ export function ProjectModal({ project, onClose }) {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, handleKeyDown]);
+
+  useEffect(() => {
+    setLightboxImage(null);
+  }, [project?.id]);
 
   return (
     <AnimatePresence>
@@ -127,8 +153,22 @@ export function ProjectModal({ project, onClose }) {
                 tags={project.tags}
               />
 
+              {sections.length > 1 && (
+                <nav className={styles.sectionNav} aria-label="Projektabschnitte">
+                  {sections.map((section) => (
+                    <a key={section.id} href={`#${section.id}`}>
+                      {section.label}
+                    </a>
+                  ))}
+                </nav>
+              )}
+
               {project.content?.length > 0 ? (
-                <ProjectContent blocks={project.content} title={project.title} />
+                <ProjectContent
+                  blocks={project.content}
+                  title={project.title}
+                  onImageOpen={openLightbox}
+                />
               ) : (
                 <>
                   {project.fullDescription && (
@@ -202,6 +242,60 @@ export function ProjectModal({ project, onClose }) {
               )}
             </div>
           </motion.div>
+          <AnimatePresence>
+            {lightboxImage && (
+              <motion.div
+                className={styles.lightbox}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                role="dialog"
+                aria-modal="true"
+                aria-label="Bildansicht"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  closeLightbox();
+                }}
+              >
+                <button
+                  type="button"
+                  className={styles.lightboxClose}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    closeLightbox();
+                  }}
+                  aria-label="Bildansicht schließen"
+                >
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M6 6l12 12M18 6L6 18"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </button>
+                <motion.figure
+                  className={styles.lightboxFigure}
+                  initial={{ scale: 0.96, y: 18 }}
+                  animate={{ scale: 1, y: 0 }}
+                  exit={{ scale: 0.98, y: 10 }}
+                  transition={{ duration: 0.24, ease: [0.2, 0.8, 0.2, 1] }}
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  <img src={lightboxImage.src} alt={lightboxImage.alt} />
+                  {lightboxImage.alt && <figcaption>{lightboxImage.alt}</figcaption>}
+                </motion.figure>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
       )}
     </AnimatePresence>

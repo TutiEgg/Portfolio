@@ -1,0 +1,78 @@
+.background {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    linear-gradient(120deg, rgba(34, 211, 238, 0.08), transparent 28%),
+    linear-gradient(300deg, rgba(45, 212, 191, 0.08), transparent 32%),
+    var(--color-bg);
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.58;
+}
+
+.grid {
+  position: absolute;
+  inset: -20%;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(circle at 50% 35%, black 0%, transparent 68%);
+  opacity: 0.45;
+  transform: rotate(-8deg);
+  animation: gridDrift 28s linear infinite;
+}
+
+.sweep {
+  position: absolute;
+  inset: -40% -15%;
+  background:
+    linear-gradient(
+      105deg,
+      transparent 34%,
+      rgba(34, 211, 238, 0.08) 44%,
+      rgba(251, 191, 36, 0.06) 50%,
+      transparent 62%
+    );
+  transform: translateX(-30%);
+  animation: sweep 16s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+}
+
+@keyframes gridDrift {
+  to {
+    transform: rotate(-8deg) translate3d(72px, 72px, 0);
+  }
+}
+
+@keyframes sweep {
+  0%,
+  18% {
+    transform: translateX(-45%);
+    opacity: 0;
+  }
+
+  35%,
+  68% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(45%);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grid,
+  .sweep {
+    animation: none;
+  }
+}

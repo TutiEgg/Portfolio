@@ -25,6 +25,21 @@ const itemVariants = {
   },
 };
 
+const focusAreas = [
+  'Machine Learning',
+  'Smart Grid',
+  'Cybersecurity',
+  'Computer Vision',
+];
+
+const signalMetrics = [
+  { label: 'Model work', value: 'ML systems' },
+  { label: 'Focus', value: 'Research → product' },
+  { label: 'Stack', value: 'Python · React' },
+];
+
+const signalBars = [34, 56, 42, 78, 64, 88, 52, 70, 46, 82, 60, 74];
+
 export function Hero({ profile, onScrollToTimeline }) {
   const {
     name,
@@ -73,6 +88,12 @@ export function Hero({ profile, onScrollToTimeline }) {
             {bio}
           </motion.p>
 
+          <motion.ul className={styles.focusPills} variants={itemVariants}>
+            {focusAreas.map((area) => (
+              <li key={area}>{area}</li>
+            ))}
+          </motion.ul>
+
           <motion.div className={styles.meta} variants={itemVariants}>
             {location && (
               <span className={styles.metaItem}>
@@ -86,6 +107,35 @@ export function Hero({ profile, onScrollToTimeline }) {
                 {email}
               </a>
             )}
+          </motion.div>
+
+          <motion.div className={styles.signalPanel} variants={itemVariants}>
+            <div className={styles.signalHeader}>
+              <span className={styles.signalStatus}>
+                <span aria-hidden="true" />
+                Available for applied AI
+              </span>
+              <span className={styles.signalCode}>live-stack</span>
+            </div>
+            <div className={styles.signalBars} aria-hidden="true">
+              {signalBars.map((height, index) => (
+                <span
+                  key={index}
+                  style={{
+                    height: `${height}%`,
+                    animationDelay: `${index * 90}ms`,
+                  }}
+                />
+              ))}
+            </div>
+            <dl className={styles.signalMetrics}>
+              {signalMetrics.map((metric) => (
+                <div key={metric.label}>
+                  <dt>{metric.label}</dt>
+                  <dd>{metric.value}</dd>
+                </div>
+              ))}
+            </dl>
           </motion.div>
 
           <motion.div className={styles.actions} variants={itemVariants}>

@@ -1,5 +1,6 @@
 import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import { motion, useScroll, useSpring } from 'framer-motion';
+import { ProjectFilters } from '../ProjectFilters/ProjectFilters.jsx';
 import { TimelineItem } from './TimelineItem.jsx';
 import { YearIndex } from './YearIndex.jsx';
 import styles from './Timeline.module.css';
@@ -11,7 +12,14 @@ import styles from './Timeline.module.css';
  */
 
 export const Timeline = forwardRef(function Timeline(
-  { projects, onOpenProject },
+  {
+    projects,
+    filters = [],
+    activeFilter = 'all',
+    onFilterChange = () => {},
+    totalProjectCount = projects.length,
+    onOpenProject,
+  },
   forwardedRef
 ) {
   const wrapperRef = useRef(null);
@@ -32,6 +40,11 @@ export const Timeline = forwardRef(function Timeline(
   const registerItem = useCallback((index, element) => {
     itemRefs.current[index] = element;
   }, []);
+
+  useEffect(() => {
+    itemRefs.current = itemRefs.current.slice(0, projects.length);
+    setActiveIndex(0);
+  }, [projects.length]);
 
   // IntersectionObserver determines which item is most central in the viewport.
   useEffect(() => {
@@ -94,6 +107,13 @@ export const Timeline = forwardRef(function Timeline(
         <p className={styles.subheading}>
           Ein chronologischer Überblick über Stationen, die mich am meisten geprägt haben.
         </p>
+        <ProjectFilters
+          filters={filters}
+          activeFilter={activeFilter}
+          onFilterChange={onFilterChange}
+          totalCount={totalProjectCount}
+          visibleCount={projects.length}
+        />
       </div>
 
       <div className={styles.track}>

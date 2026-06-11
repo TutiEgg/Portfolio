@@ -1,0 +1,83 @@
+.filters {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  margin: var(--space-10, 2.5rem) auto 0;
+}
+
+.filterRail {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-full);
+  background: rgba(17, 23, 41, 0.58);
+  box-shadow: inset 0 0 24px rgba(255, 255, 255, 0.025);
+}
+
+.filterButton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-full);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  transition:
+    color 0.25s var(--ease-out),
+    background 0.25s var(--ease-out),
+    transform 0.25s var(--ease-out);
+}
+
+.filterButton:hover {
+  color: var(--color-text);
+  background: rgba(255, 255, 255, 0.055);
+  transform: translateY(-1px);
+}
+
+.filterButton.isActive {
+  color: #07111f;
+  background: linear-gradient(135deg, #2dd4bf, #22d3ee 55%, #fbbf24);
+  box-shadow: 0 12px 28px rgba(34, 211, 238, 0.18);
+}
+
+.filterMark {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-full);
+  background: currentColor;
+  opacity: 0.55;
+}
+
+.filterButton strong {
+  min-width: 1.7rem;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-full);
+  background: rgba(0, 0, 0, 0.18);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+}
+
+.summary {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.16em;
+  color: var(--color-text-subtle);
+  text-transform: uppercase;
+}
+
+@media (max-width: 720px) {
+  .filterRail {
+    border-radius: var(--radius-lg);
+  }
+
+  .filterButton {
+    flex: 1 1 44%;
+    justify-content: center;
+  }
+}
