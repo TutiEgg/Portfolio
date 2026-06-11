@@ -1,5 +1,169 @@
 [
   {
+    "id": "silgentas-2026",
+    "title": "SILGENTAS — Sichere KOF-Koordination und Anomalieerkennung für intelligente Quartiere",
+    "month": "2026-06",
+    "exactDate": "Juni 2026 (Abschluss)",
+    "location": "U-Glow GmbH · SILGENTAS-Forschungsprojekt",
+    "image": "/images/silgentas/dashboard.png",
+    "shortDescription": "Entwicklung eines Sicherheits- und Koordinationsframeworks für intelligente Quartiersenergie-Systeme unter §14a EnWG, §9 EEG und BSI TR-03109. Im Fokus standen eine KOF zur nicht-diskriminierenden Lastverteilung für CLS-Assets, ein ML-basiertes Anomaly-Detection-System für IoT-/Smart-Meter-Kommunikation und eine robuste Evaluation mit Fault-Injection, Availability-Metriken und SAC-basierter Reinforcement-Learning-Koordination.",
+    "languages": ["Python", "JavaScript"],
+    "tags": [
+      "Smart Grid",
+      "§14a EnWG",
+      "§9 EEG",
+      "BSI TR-03109",
+      "KOF",
+      "CLS / SMGw",
+      "Reinforcement Learning",
+      "Soft Actor-Critic",
+      "Anomaly Detection",
+      "IoT Security",
+      "CNN-BiLSTM",
+      "PyTorch",
+      "FastAPI",
+      "MQTT",
+      "IEC 61850",
+      "CLS.EDI",
+      "Availability Modelling",
+      "Fault Injection"
+    ],
+    "links": [],
+    "content": [
+      { "type": "heading", "level": 2, "text": "Worum geht es?" },
+      { "type": "image", "src": "/images/silgentas/dashboard.png", "alt": "SILGENTAS Network Security Dashboard mit Live Event Stream, Severity-Filtern und Detailansicht eines erkannten MITM-Events" },
+      { "type": "paragraph", "text": "**SILGENTAS** behandelt die Frage, wie intelligente Quartiere sicher, interoperabel und regulatorisch sauber koordiniert werden können, wenn viele steuerbare Verbraucher und Erzeuger gleichzeitig am Niederspannungsnetz hängen. Dazu gehören Wallboxen, Wärmepumpen, Nachtspeicherheizungen sowie PV- und Wind-Erzeugungsanlagen, die über Smart-Meter-Gateways und CLS-Kanäle angebunden werden." },
+      { "type": "paragraph", "text": "Der technische Kern ist die **Koordinierungsfunktion (KOF)**: Sie erhält vom Verteilnetzbetreiber einen Curtailment- oder Notfallrahmen, berechnet eine nicht-diskriminierende Leistungsverteilung für registrierte CLS-Assets und gibt die Allokation über MSB, GWA und SMGw in Richtung Feldgeräte weiter. Parallel dazu wurde ein Sicherheitsmodul entwickelt, das Kommunikationsanomalien auf IoT- und Smart-Meter-Schnittstellen erkennt." },
+
+      { "type": "heading", "level": 2, "text": "Meine Rolle" },
+      {
+        "type": "list",
+        "items": [
+          "**Anforderungs- und Architekturanalyse** für den vollständigen §14a-EnWG-Kontrollpfad VNB → KOF → MSB → GWA → SMGw → CLS inklusive Schutzbedarfen, Latenzbudgets und BSI-TR-03109-Grenzen.",
+          "**Konzeption und Implementierung** einer ML-basierten Anomaly-Detection-Pipeline für IoT-/MQTT-Verkehr mit CNN1D, ResNet50-1D und CNN-BiLSTM sowie Modell-Registry, Training Pipeline und FastAPI-Inferenzschicht.",
+          "**Entwurf statistischer Fallback-Methoden** für Protokolle ohne gelabelte Datensätze, insbesondere IEC 61850 MMS, AR 2829 und CLS.EDI, mit Mahalanobis-Baseline, Zeitreihenabweichung und Entropieanalyse.",
+          "**Aufbau eines Demonstrators** mit Security Dashboard, CSV-Upload, simuliertem Live Event Stream, Severity-Filtern, Klassifikationsansicht und Detailpanel für einzelne Events.",
+          "**Entwicklung und Evaluation** einer KOF-Koordination auf Basis von Soft Actor-Critic, Fault-Injection-Szenarien, Availability-Modellierung, Fallback-Policies und Vergleich gegen ProportionalPolicy.",
+          "**Dokumentation und Traceability** über Requirements, Testfälle, API-Spezifikationen, Evaluationsmetriken und offene Grenzen für eine spätere produktionsnahe Validierung."
+        ]
+      },
+
+      { "type": "heading", "level": 2, "text": "Regulatorischer und technischer Rahmen" },
+      { "type": "paragraph", "text": "Das Projekt bewegt sich im Spannungsfeld aus **§14a EnWG**, **§9 EEG**, **BSI TR-03109**, Smart-Meter-Gateway-Architektur und KRITIS-Anforderungen. Die KOF darf nicht direkt mit SMGw oder CLS-Geräten sprechen; alle Steuerbefehle müssen über die regulierte Kette aus MSB, GWA und SMGw laufen. Dadurch wird die Software nicht nur ein Optimierungsproblem, sondern auch ein Rollen-, Schnittstellen- und Nachweisproblem." },
+      {
+        "type": "list",
+        "items": [
+          "**VNB → KOF:** Authentifizierter Curtailment- oder Notfallrahmen mit Kapazitätslimit und Antwortdeadline.",
+          "**KOF → MSB:** Per-Asset- oder Per-Cluster-Allokation, abhängig von MSB-Fähigkeit über REST/HTTPS oder IEC 61850 MMS.",
+          "**MSB/GWA/SMGw → CLS:** Regulierter Feldpfad über Smart-Meter-Gateway und CLS-Kanal, z. B. CLS.EDI, lokale EMS-Integration oder MQTT/OCPP-nahe Datenpfade.",
+          "**KRITIS-Modus:** Bei §13-EnWG-Notfällen müssen normale Nutzerpräferenzen zurückstehen; die KOF muss innerhalb kurzer Zeit in einen sicheren Prioritätsmodus wechseln."
+        ]
+      },
+
+      { "type": "heading", "level": 2, "text": "AP3: Anomaly Detection für IoT-Kommunikation" },
+      { "type": "image", "src": "/images/silgentas/ml-architecture.png", "alt": "Softwarearchitektur der Anomaly-Detection-Pipeline mit API Layer, Training Layer, Data Layer, Storage und Model Layer" },
+      { "type": "paragraph", "text": "Für AP3 entstand eine modulare Anomaly-Detection-Pipeline. Die Daten werden ingestiert, bereinigt, in Train/Validation/Test-Splits gebracht, normalisiert und über ein festes Feature-Schema reproduzierbar an Modelle übergeben. Die Modellschicht nutzt eine Registry, sodass Architekturen wie CNN1D, ResNet50-1D und DCNN-BiLSTM ohne Umbau des Trainings- oder Inferenzcodes gewechselt werden können." },
+      { "type": "image", "src": "/images/silgentas/training-sequence.png", "alt": "Sequenzdiagramm der Trainingspipeline von Konfiguration und Datenimport über Preprocessing, Model Registry, Training Engine bis zu Model Artifacts" },
+      {
+        "type": "list",
+        "items": [
+          "**CNN1D:** Leichtgewichtiges Modell für tabular-sequentielle Netzwerkfeatures; schnell, robust und gut für ressourcenarme Deployments.",
+          "**ResNet50-1D:** Tiefere Residual-Architektur für komplexere Feature-Interaktionen, aber mit strukturellen Schwächen bei tabularen Daten.",
+          "**CNN-BiLSTM:** Hybrid aus Convolutional Layers und bidirektionalem LSTM, ausgelegt auf lokale Muster plus langfristige Abhängigkeiten.",
+          "**FastAPI Service Layer:** `/health`, `/inference/run` und `/inference/upload` für Einzel- und Batch-Inferenz, inklusive Schema-Alignment und SSE-Streaming für Dashboards."
+        ]
+      },
+
+      { "type": "heading", "level": 2, "text": "Modellvergleich und Security-Ergebnisse" },
+      { "type": "image", "src": "/images/silgentas/confusion-cnn-bilstm.png", "alt": "Row-normalisierte Confusion Matrix des CNN-BiLSTM-Modells für IoT-Angriffs- und Normalverkehrsklassen" },
+      { "type": "paragraph", "text": "Die Evaluation priorisiert **Macro Recall**, weil seltene Angriffsklassen in Security-Systemen nicht von häufigem Normalverkehr überdeckt werden dürfen. Auf dem DNN-EdgeIIoT-/MQTT-Pfad erreichten CNN-BiLSTM und ResNet50-1D jeweils **84,37 % Macro Recall**; CNN1D erreichte **92,60 % Accuracy**, war aber weniger ausgewogen. Als primäre Deployment-Empfehlung wurde CNN-BiLSTM gewählt, da es die stabilste klassenbalancierte Leistung zeigte." },
+      {
+        "type": "list",
+        "items": [
+          "**CNN-BiLSTM:** 84,37 % Macro Recall und 85,92 % Accuracy; perfekte oder sehr starke Erkennung bei kritischen Klassen wie DDoS_ICMP, DDoS_UDP, MITM, Normal, SQL Injection und Uploading.",
+          "**CNN1D:** 70,34 % Macro Recall, aber 92,60 % Accuracy; gut für hohe Durchsatzanforderungen, schwächer bei Minderheitsklassen.",
+          "**ResNet50-1D:** 84,37 % Macro Recall und 91,42 % Accuracy; stark in einzelnen Klassen, aber weniger stabil wegen künstlicher Strukturannahmen bei tabularen Features.",
+          "**Nicht-MQTT-Hops:** Für IEC 61850 MMS, AR 2829 und CLS.EDI wurde ein statistischer Pfad empfohlen, weil keine gelabelten realen Datensätze verfügbar waren."
+        ]
+      },
+      { "type": "paragraph", "text": "Für die nicht gelabelten Protokollpfade wurde eine statistische Korrelationserkennung aufgebaut. Sie kombiniert Mahalanobis-Abweichung vom benignen Baseline-Profil, Zeitreihenabweichung und Entropieanalyse. Auf synthetischen Protokollfenstern wurden **89,26 % Accuracy**, **100 % Precision**, **75,83 % Recall** und **86,26 % F1** erreicht. Besonders wichtig: Es gab keine False Positives, was für operative KOF-/MSB-Pfade entscheidend ist, weil unnötige Fallbacks vermieden werden müssen." },
+
+      { "type": "heading", "level": 2, "text": "AP4: KOF Availability und Koordination" },
+      { "type": "image", "src": "/images/silgentas/availability-heatmap.png", "alt": "Availability-Heatmap der KOF-Kontrollkette über zwölf Fault-Szenarien von baseline bis steuerbox_disconnect" },
+      { "type": "paragraph", "text": "AP4 modelliert die KOF nicht isoliert, sondern als Teil einer gesamten Steuerkette. Die Availability-Bewertung berücksichtigt VNB, KOF, MSB, GWA, SMGw, iMSys und EMS mit gewichteten Beiträgen. Fault-Szenarien wie EEBUS Disconnect, MMS Disconnect, SML Disconnect, MBus Disconnect und Steuerbox Disconnect zeigen, welche Fehler entlang der Kette abwärts propagieren und welche Komponenten außerhalb des U-Glow-Verantwortungsbereichs liegen." },
+      { "type": "paragraph", "text": "Die KOF selbst wurde als geschlossener Regelkreis betrachtet: Zustand beobachten, Allokation berechnen, Aktion anwenden, Reward aus Verbrauch/Fairness/Verfügbarkeit bewerten und die Policy verbessern. Ein Soft-Actor-Critic-Agent ersetzt dabei eine frühere DDPG-Variante, weil SAC in der kontinuierlichen 31-Cluster-Frankfurt-Aktionsdomäne stabiler konvergierte und durch Entropieregularisierung robuster exploriert." },
+      {
+        "type": "list",
+        "items": [
+          "**Observation:** VNB-Kapazitätslimit, Cluster-Nachfrage, Entity-Availability je Hop und vorherige Allokation zur Glättung.",
+          "**Action:** Kontinuierlicher Leistungsverteilungsvektor, anschließend normalisiert und geclippt auf physische und regulatorische Constraints.",
+          "**Reward:** Kombination aus hoher Kapazitätsnutzung, Demand Satisfaction und geringer Ungleichverteilung.",
+          "**Fallback Chain:** ProportionalPolicy und FairSharePolicy übernehmen, wenn der SAC-Agent oder ein Kommunikationshop nicht rechtzeitig reagiert.",
+          "**Control Loop:** Entscheidungen müssen innerhalb des 1-Sekunden-Regelkreises bleiben und den §14a-/§13-Kontext berücksichtigen."
+        ]
+      },
+
+      { "type": "heading", "level": 2, "text": "Curtailment- und Fault-Simulation" },
+      {
+        "type": "imageRow",
+        "images": [
+          { "src": "/images/silgentas/blackout-uncoordinated.png", "alt": "Unkoordinierte Frankfurt-Demo: Nachfrage überschreitet das Capacity Limit und triggert eine Blackout-Zone" },
+          { "src": "/images/silgentas/kof-managed-curtailment.png", "alt": "KOF-gemanagte Frankfurt-Demo: Allokation bleibt trotz Nachfrage-Peaks am Capacity Limit gedeckelt" }
+        ]
+      },
+      { "type": "paragraph", "text": "Für die §14a-Überlastbewertung wurde eine Frankfurt-Demo aufgebaut: mehrere EMS-Cluster, 22 Ladestationen und ein 240-kW-Capacity-Limit. Ohne KOF folgt die Allokation der Nachfrage und kann bei synchronem Wiederhochlauf die Kapazitätsgrenze verletzen. Mit KOF bleibt die Allokation dagegen strikt gedeckelt, auch wenn die Nachfrage in Peaks darüber liegt." },
+      { "type": "image", "src": "/images/silgentas/allocation-fault-timeseries.png", "alt": "Demand-vs-Allocation-Zeitreihen für Baseline, EEBUS Disconnect, EEBUS Latency, EEBUS Loss und MMS Disconnect" },
+      { "type": "paragraph", "text": "Die größere Evaluation läuft auf einer Frankfurt-Konfiguration mit **31 Clustern**, **500 kW VNB-Capacity-Limit**, **100 Evaluationsschritten** pro Schedule und zwölf Fault-Schedules. Die Schedules decken baseline, single_link_failure, eebus_latency, eebus_loss, eebus_disconnect, intermittent, cascade, stress_test, mms_disconnect, sml_disconnect, mbus_disconnect und steuerbox_disconnect ab." },
+
+      { "type": "heading", "level": 2, "text": "SAC vs. ProportionalPolicy" },
+      { "type": "paragraph", "text": "Der fault-aware SAC-Agent wurde über **100 000 Timesteps** trainiert. Die Reward-Kurve stieg von 181 447 in Episode 0 auf ein stabiles Plateau von etwa **215 000 bis 220 000** ab Episode 100. Die Trainings-Faults deckten baseline, eebus_disconnect und eebus_latency ab; die Evaluation wurde danach auf alle zwölf Fault-Schedules ausgeweitet." },
+      {
+        "type": "list",
+        "items": [
+          "**SAC:** 500,0 kW mittlerer Verbrauch in allen zwölf Schedules, Utilisation 1,000, Demand Satisfaction Rate 1,000, Energy Not Served 0,0 kWh und Gini 0,294.",
+          "**ProportionalPolicy:** 323,6 bis 407,6 kW mittlerer Verbrauch, Utilisation 0,647 bis 0,815, Energy Not Served 5,7 bis 68,3 kWh und Gini 0,655 bis 0,709.",
+          "**Worst Case:** Bei eebus_disconnect verschwendet die ProportionalPolicy Allokation auf einen unerreichbaren Cluster; SAC lernt, dort auf 0 zu gehen und die Kapazität auf erreichbare Cluster umzulegen.",
+          "**Stress Test:** MMS-Latenz 100 ms plus 20 % Loss und EEBUS Loss 50 % reduziert ProportionalPolicy auf 390,5 kW und 35,7 kWh Energy Not Served; SAC bleibt bei voller Performance."
+        ]
+      },
+
+      { "type": "heading", "level": 2, "text": "Schnittstellen und Integration" },
+      { "type": "paragraph", "text": "Für die Integration wurden API-Verträge und Testfälle über die KOF- und Anomaly-Detection-Subsysteme dokumentiert. Die KOF stellt VNB-Ingress, MSB-Dispatch und Health Endpoint bereit. Die Simulation nutzt eine Observation/Action-API für den Austausch zwischen SAC-Agent und Umgebung sowie eine Reward-History-API für Zeitreihenlogs. Der Anomaly-Detection-Service stellt Inferenzendpunkte für JSON- und CSV-Eingaben bereit." },
+      {
+        "type": "list",
+        "items": [
+          "**VNB Ingress:** REST/HTTPS mit Mutual TLS und validierter Signalstruktur.",
+          "**MSB Dispatch:** REST/HTTPS oder IEC 61850 MMS, abhängig vom Partner-Backend.",
+          "**KOF Health:** `/health` für Availability Monitoring und Integrationstests.",
+          "**Anomaly Inference:** `/inference/run` und `/inference/upload` für Einzel-, Batch- und Dashboard-Szenarien.",
+          "**Simulation:** `/simulation/step` und Reward-History-Endpunkte für Training, Evaluation und Fault Injection."
+        ]
+      },
+
+      { "type": "heading", "level": 2, "text": "Grenzen und nächste Schritte" },
+      {
+        "type": "list",
+        "items": [
+          "**Reale Protokolldaten:** IEC 61850 MMS, AR 2829 und CLS.EDI wurden mangels gelabelter Datensätze statistisch und synthetisch validiert; reale Traffic Captures bleiben ein wichtiger Folgeschritt.",
+          "**MQTT-Domänenverschiebung:** CNN-BiLSTM wurde auf DNN-EdgeIIoT trainiert; EV-spezifischer MQTT-/OCPP-/EEBUS-Verkehr sollte später separat feinjustiert werden.",
+          "**SAC-Generalisation:** Die Evaluation über zwölf Schedules ist stark, aber das Training sah nur drei Schedules. Weitere Fault-Kombinationen und Real-World-Demand-Patterns würden die Aussage absichern.",
+          "**End-to-End-Hardware:** CLS.EDI- und IEC-61850-MMS-Pfade wurden teilweise gegen Simulatoren oder Testtools validiert; ein vollständiger Live-MSB-/SMGw-/CLS-Test wäre der nächste Produktionsschritt."
+        ]
+      },
+
+      { "type": "heading", "level": 2, "text": "Ergebnis" },
+      {
+        "type": "list",
+        "items": [
+          "Ein **durchgängiger Architektur- und Requirements-Rahmen** für sichere Quartierskoordination unter §14a EnWG, §9 EEG und BSI TR-03109.",
+          "Ein **ML- und Statistik-basiertes Security-Konzept** für unterschiedliche Kommunikationshops, inklusive produktionsnaher FastAPI-Inferenz und Dashboard-Demonstrator.",
+          "Ein **fault-aware KOF-Demonstrator** mit SAC-Agent, Fallback-Policies, Availability Heatmaps, Fault Injection und quantitativer Evaluation.",
+          "Ein klares Ergebnis für die Koordination: SAC nutzt die verfügbare Kapazität vollständig, reduziert Energy Not Served auf 0 kWh und hält die Allokation fairer als die proportionale Baseline."
+        ]
+      }
+    ]
+  },
+  {
     "id": "rilkosan-2026",
     "title": "RILKOSAN — Echtzeitfähige Anomalieerkennung für industrielle EtherCAT-Netzwerke",
     "month": "2026-03",
