@@ -190,8 +190,6 @@
       { "label": "Final Review Meeting (Hamburg, 26.03.2026)", "url": "https://www.bmftr.bund.de/" }
     ],
     "content": [
-      { "type": "heading", "level": 2, "text": "Worum geht es?" },
-      { "type": "image", "src": "/images/rilkosan/titelfolie.png", "alt": "RILKOSAN — Final Review Meeting, Hamburg 26.03.2026" },
       {
         "type": "slideshow",
         "eyebrow": "Final Review Meeting",
@@ -224,6 +222,7 @@
           }
         ]
       },
+      { "type": "heading", "level": 2, "text": "Worum geht es?" },
       { "type": "paragraph", "text": "Industrielle Steuerungssysteme sind das Rückgrat moderner Fertigung — und gleichzeitig zunehmend ein Ziel für Cyberangriffe. **EtherCAT**, eines der am weitesten verbreiteten Echtzeit-Ethernet-Protokolle in der Automatisierung, wurde auf Determinismus und Geschwindigkeit optimiert — **nicht auf Sicherheit**. Es verschlüsselt nicht, authentifiziert nicht und inspiziert die übertragenen Nutzdaten nicht. Klassische IT-Intrusion-Detection-Systeme sind für diese Umgebung zu langsam: Sie brauchen Millisekunden bis Sekunden, während ein EtherCAT-Zyklus oft nur **20 Millisekunden oder weniger** dauert." },
       { "type": "paragraph", "text": "In **RILKOSAN** (Januar 2023 – März 2026, gefördert vom BMFTR) habe ich bei der U-Glow GmbH ein **echtzeitfähiges Anomalie- und Intrusion-Detection-Framework** für genau solche EtherCAT-basierten Industrienetzwerke konzipiert, implementiert und validiert — inklusive eines selbstheilenden Netzwechsel-Mechanismus. Die zentralen Ergebnisse sind in einem Journal-Whitepaper zusammengefasst, das als Erstautor entstanden ist." },
 

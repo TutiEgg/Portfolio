@@ -2,6 +2,7 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { AmbientBackground } from './components/AmbientBackground/AmbientBackground.jsx';
 import { Hero } from './components/Hero/Hero.jsx';
 import { Education } from './components/Education/Education.jsx';
+import { ProjectImageSlideshow } from './components/ProjectImageSlideshow/ProjectImageSlideshow.jsx';
 import { Timeline } from './components/Timeline/Timeline.jsx';
 import { ProjectModal } from './components/ProjectModal/ProjectModal.jsx';
 import { Footer } from './components/Footer/Footer.jsx';
@@ -56,6 +57,57 @@ function matchesFilter(project, filter) {
   return filter.terms.some((term) => haystack.includes(term));
 }
 
+function collectProjectImages(projects) {
+  const seen = new Set();
+  const images = [];
+
+  const addImage = (project, image, fallbackCaption) => {
+    const source = typeof image === 'string' ? image : image?.src;
+    if (!source || seen.has(source)) return;
+
+    seen.add(source);
+    images.push({
+      src: source,
+      alt:
+        (typeof image === 'string' ? undefined : image.alt) ||
+        `${project.title} — Projektbild`,
+      caption:
+        (typeof image === 'string' ? undefined : image.caption) ||
+        fallbackCaption ||
+        project.title,
+      projectTitle: project.title,
+    });
+  };
+
+  for (const project of projects) {
+    addImage(project, project.image, project.title);
+
+    for (const block of project.content ?? []) {
+      if (block.type === 'image') {
+        addImage(project, block, block.alt);
+      }
+
+      if (block.type === 'imageRow') {
+        for (const image of block.images ?? []) {
+          addImage(project, image, image.caption || image.alt);
+        }
+      }
+
+      if (block.type === 'slideshow') {
+        for (const image of block.images ?? []) {
+          addImage(project, image, image.caption || image.alt);
+        }
+      }
+    }
+
+    for (const source of project.gallery ?? []) {
+      addImage(project, source, project.title);
+    }
+  }
+
+  return images;
+}
+
 export default function App() {
   const timelineRef = useRef(null);
   const [selectedProject, setSelectedProject] = useState(null);
@@ -67,6 +119,7 @@ export default function App() {
       [...rawProjects].sort((a, b) => (a.month < b.month ? 1 : -1)),
     []
   );
+  const projectImages = useMemo(() => collectProjectImages(projects), [projects]);
   const filters = useMemo(
     () =>
       FILTER_DEFINITIONS.map((filter) => ({
@@ -96,6 +149,7 @@ export default function App() {
       <AmbientBackground />
       <Hero profile={profile} onScrollToTimeline={scrollToTimeline} />
       <Education entries={education} />
+      <ProjectImageSlideshow images={projectImages} />
       <Timeline
         ref={timelineRef}
         projects={filteredProjects}
