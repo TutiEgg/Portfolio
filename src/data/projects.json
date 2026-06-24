@@ -192,6 +192,38 @@
     "content": [
       { "type": "heading", "level": 2, "text": "Worum geht es?" },
       { "type": "image", "src": "/images/rilkosan/titelfolie.png", "alt": "RILKOSAN — Final Review Meeting, Hamburg 26.03.2026" },
+      {
+        "type": "slideshow",
+        "eyebrow": "Final Review Meeting",
+        "title": "Abschlusspräsentation & Demonstrator",
+        "images": [
+          {
+            "src": "/images/rilkosan/final-review/presentation.jpeg",
+            "alt": "Vorstellung des RILKOSAN-Demonstrators während der Abschlusspräsentation",
+            "caption": "Abschlusspräsentation des Projekts: Vorstellung des Demonstrators und der Forschungsergebnisse vor Projektpartnern."
+          },
+          {
+            "src": "/images/rilkosan/final-review/demonstrator-detail.jpeg",
+            "alt": "Detailansicht des RILKOSAN-Demonstrators mit Beckhoff-Komponenten, Monitor und laufender Analyse",
+            "caption": "Live-Demo am Testbed mit Beckhoff-Komponenten, passiver EtherCAT-Erfassung und laufender Auswertung."
+          },
+          {
+            "src": "/images/rilkosan/final-review/demonstrator-overview.jpeg",
+            "alt": "Überblick über die Demonstrator-Vorführung mit Monitor, Testaufbau und Beobachtern",
+            "caption": "Vorführung der Pipeline am realen Demonstrator: Capture, Analyse und Detektionslogik im Zusammenspiel."
+          },
+          {
+            "src": "/images/rilkosan/final-review/audience.jpeg",
+            "alt": "Teilnehmende des RILKOSAN Final Review Meetings während der Abschlusspräsentation",
+            "caption": "Final Review Meeting in Hamburg mit Projektpartnern und fachlicher Diskussion der Ergebnisse."
+          },
+          {
+            "src": "/images/rilkosan/final-review/team.jpg",
+            "alt": "Gruppenfoto des RILKOSAN-Projektteams beim Final Review Meeting",
+            "caption": "Projektteam und Partner beim Abschluss des RILKOSAN-Forschungsprojekts."
+          }
+        ]
+      },
       { "type": "paragraph", "text": "Industrielle Steuerungssysteme sind das Rückgrat moderner Fertigung — und gleichzeitig zunehmend ein Ziel für Cyberangriffe. **EtherCAT**, eines der am weitesten verbreiteten Echtzeit-Ethernet-Protokolle in der Automatisierung, wurde auf Determinismus und Geschwindigkeit optimiert — **nicht auf Sicherheit**. Es verschlüsselt nicht, authentifiziert nicht und inspiziert die übertragenen Nutzdaten nicht. Klassische IT-Intrusion-Detection-Systeme sind für diese Umgebung zu langsam: Sie brauchen Millisekunden bis Sekunden, während ein EtherCAT-Zyklus oft nur **20 Millisekunden oder weniger** dauert." },
       { "type": "paragraph", "text": "In **RILKOSAN** (Januar 2023 – März 2026, gefördert vom BMFTR) habe ich bei der U-Glow GmbH ein **echtzeitfähiges Anomalie- und Intrusion-Detection-Framework** für genau solche EtherCAT-basierten Industrienetzwerke konzipiert, implementiert und validiert — inklusive eines selbstheilenden Netzwechsel-Mechanismus. Die zentralen Ergebnisse sind in einem Journal-Whitepaper zusammengefasst, das als Erstautor entstanden ist." },
 
@@ -272,6 +304,20 @@
 
       { "type": "heading", "level": 2, "text": "Realer EtherCAT-Demonstrator" },
       { "type": "paragraph", "text": "Die Konzepte wurden anschließend auf einem **realen Testbed** validiert. Zwei **Beckhoff CX9020** Embedded-Controller mit **EK1100 EtherCAT-Klemmen** bilden zwei verteilte Steuerungssegmente, gekoppelt über eine **Beckhoff EL6695 EtherCAT-Bridge** als Distributed-Clocks-Referenz. Ein PC mit zwei **Intel i210**-Netzwerkkarten dient als transparente Inline-Bridge und zeichnet den Verkehr mit IEEE-1588-Hardware-Zeitstempeln auf." },
+      { "type": "paragraph", "text": "Im finalen Review Meeting habe ich diesen Aufbau live vorgestellt und erklärt, wie Forschungsergebnisse, Detektionsarchitektur und Demonstrator zusammenhängen: vom EtherCAT-Testbed über Wireshark- und Kafka-basierte Erfassung bis hin zur Anomalieerkennung und zum selbstheilenden Netzwechsel." },
+      {
+        "type": "imageRow",
+        "images": [
+          {
+            "src": "/images/rilkosan/final-review/demonstrator-overview.jpeg",
+            "alt": "Vorführung des RILKOSAN-Demonstrators am realen Testbed während der Abschlusspräsentation"
+          },
+          {
+            "src": "/images/rilkosan/final-review/demonstrator-detail.jpeg",
+            "alt": "Detailansicht der Beckhoff-Komponenten und der laufenden Analyse während der Demonstrator-Vorstellung"
+          }
+        ]
+      },
       { "type": "image", "src": "/images/rilkosan/architektur.png", "alt": "Testbed-Architektur: Industrial Control (SPS 1/2), EtherCAT-Feldnetz, transparente Inline-Capture über zwei Intel-i210-NICs, Wireshark, Feature-Engineering und Kafka-Pipeline zum Detektor." },
       { "type": "paragraph", "text": "Die passive Erfassung greift nicht in den Kommunikationspfad ein: Der Inline-Bridge-PC leitet jeden Frame bitidentisch weiter und stellt parallel eine Kopie über Wireshark und einen Feature-Extractor auf das Kafka-Topic `net.sim` bereit. Von dort konsumieren Detektor und Reporter in Echtzeit." },
       { "type": "image", "src": "/images/rilkosan/setup.png", "alt": "Realer EtherCAT-Demonstrator: zwei Beckhoff CX9020 Embedded-PCs, EtherCAT-Klemmen und ein Qualcomm-basiertes Funkmodul als zweiter, drahtloser Kommunikationspfad" },

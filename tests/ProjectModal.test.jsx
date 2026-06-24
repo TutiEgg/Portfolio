@@ -16,6 +16,31 @@ const project = {
   links: [{ label: 'GitHub', url: 'https://github.com/example' }],
 };
 
+const slideshowProject = {
+  ...project,
+  fullDescription: undefined,
+  links: [],
+  content: [
+    { type: 'heading', level: 2, text: 'Worum geht es?' },
+    {
+      type: 'slideshow',
+      title: 'Final Review',
+      images: [
+        {
+          src: '/images/rilkosan/final-review/presentation.jpeg',
+          alt: 'Demo shot 1',
+          caption: 'Presentation caption',
+        },
+        {
+          src: '/images/rilkosan/final-review/demonstrator-detail.jpeg',
+          alt: 'Demo shot 2',
+          caption: 'Detail caption',
+        },
+      ],
+    },
+  ],
+};
+
 describe('ProjectModal', () => {
   it('renders title, tags and full description paragraphs when a project is provided', () => {
     render(<ProjectModal project={project} onClose={() => {}} />);
@@ -55,5 +80,19 @@ describe('ProjectModal', () => {
     render(<ProjectModal project={project} onClose={onClose} />);
     await user.click(screen.getByRole('button', { name: /schließen/i }));
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders slideshow content blocks and opens their images in the lightbox', async () => {
+    const user = userEvent.setup();
+    render(<ProjectModal project={slideshowProject} onClose={() => {}} />);
+
+    expect(screen.getByText('Final Review')).toBeInTheDocument();
+    expect(screen.getByText('Presentation caption')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /chstes bild/i }));
+    expect(screen.getByText('Detail caption')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /demo shot 2/i }));
+    expect(screen.getByRole('dialog', { name: /bildansicht/i })).toBeInTheDocument();
   });
 });

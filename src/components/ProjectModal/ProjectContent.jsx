@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { assetPath } from '../../utils/assetPath.js';
 import styles from './ProjectModal.module.css';
 
@@ -25,6 +26,7 @@ export function sectionAnchorId(text, index) {
  *  - paragraph ({ text, markdown?: boolean })
  *  - image     ({ src, alt? })
  *  - imageRow  ({ images: [{ src, alt? }] }) — side-by-side figures
+ *  - slideshow ({ title?, eyebrow?, images: [{ src, alt?, caption? }] })
  *  - list      ({ ordered?: boolean, items: [{ text }] })
  *
  * Heading levels follow Markdown depth (## = 2, ### = 3, #### = 4) and map to
@@ -63,6 +65,133 @@ function Figure({ src, alt, className = '', onImageOpen }) {
         loading="lazy"
       />
     </button>
+  );
+}
+
+function ArrowIcon({ direction }) {
+  const path =
+    direction === 'next'
+      ? 'M9 18l6-6-6-6'
+      : 'M15 18l-6-6 6-6';
+
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d={path}
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function Slideshow({ title, eyebrow, images = [], projectTitle, onImageOpen }) {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const slideCount = images.length;
+  const activeSlide = images[activeIndex] ?? images[0];
+
+  useEffect(() => {
+    setActiveIndex(0);
+  }, [slideCount]);
+
+  useEffect(() => {
+    if (slideCount <= 1) return undefined;
+
+    const intervalId = window.setInterval(() => {
+      setActiveIndex((currentIndex) => (currentIndex + 1) % slideCount);
+    }, 5200);
+
+    return () => window.clearInterval(intervalId);
+  }, [slideCount]);
+
+  if (!slideCount) return null;
+
+  const goToPrevious = () => {
+    setActiveIndex((currentIndex) => (currentIndex - 1 + slideCount) % slideCount);
+  };
+
+  const goToNext = () => {
+    setActiveIndex((currentIndex) => (currentIndex + 1) % slideCount);
+  };
+
+  const activeAlt =
+    activeSlide.alt || `${projectTitle} — Slideshow-Bild ${activeIndex + 1}`;
+  const activeSrc = assetPath(activeSlide.src);
+
+  return (
+    <section
+      className={styles.slideshow}
+      aria-label={title || `${projectTitle} Bildergalerie`}
+    >
+      <button
+        type="button"
+        className={styles.slideshowImageButton}
+        onClick={() => onImageOpen?.({ src: activeSrc, alt: activeAlt })}
+        aria-label={`Bild öffnen: ${activeAlt}`}
+      >
+        {images.map((slide, index) => (
+          <img
+            key={slide.src}
+            src={assetPath(slide.src)}
+            alt={slide.alt || `${projectTitle} — Slideshow-Bild ${index + 1}`}
+            className={`${styles.slideshowImage} ${
+              index === activeIndex ? styles.slideshowImageActive : ''
+            }`.trim()}
+            loading={index === 0 ? 'eager' : 'lazy'}
+          />
+        ))}
+      </button>
+
+      <div className={styles.slideshowChrome}>
+        <div className={styles.slideshowText}>
+          {eyebrow && <span className={styles.slideshowEyebrow}>{eyebrow}</span>}
+          {title && <h4 className={styles.slideshowTitle}>{title}</h4>}
+          {activeSlide.caption && (
+            <p className={styles.slideshowCaption}>{activeSlide.caption}</p>
+          )}
+        </div>
+
+        {slideCount > 1 && (
+          <div className={styles.slideshowControls}>
+            <button
+              type="button"
+              className={styles.slideshowControl}
+              onClick={goToPrevious}
+              aria-label="Vorheriges Bild"
+            >
+              <ArrowIcon direction="previous" />
+            </button>
+            <button
+              type="button"
+              className={styles.slideshowControl}
+              onClick={goToNext}
+              aria-label="Nächstes Bild"
+            >
+              <ArrowIcon direction="next" />
+            </button>
+          </div>
+        )}
+      </div>
+
+      {slideCount > 1 && (
+        <div className={styles.slideshowDots}>
+          {images.map((slide, index) => (
+            <button
+              key={slide.src}
+              type="button"
+              className={`${styles.slideshowDot} ${
+                index === activeIndex ? styles.slideshowDotActive : ''
+              }`.trim()}
+              onClick={() => setActiveIndex(index)}
+              aria-label={`Bild ${index + 1} anzeigen`}
+              aria-pressed={index === activeIndex}
+            />
+          ))}
+        </div>
+      )}
+    </section>
   );
 }
 
@@ -150,6 +279,19 @@ export function ProjectContent({ blocks, title, onImageOpen }) {
                 </figure>
               ))}
             </div>
+          );
+        }
+
+        if (block.type === 'slideshow') {
+          return (
+            <Slideshow
+              key={key}
+              title={block.title}
+              eyebrow={block.eyebrow}
+              images={block.images}
+              projectTitle={title}
+              onImageOpen={onImageOpen}
+            />
           );
         }
 
