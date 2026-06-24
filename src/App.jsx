@@ -39,6 +39,8 @@ const FILTER_DEFINITIONS = [
   },
 ];
 
+const ABSOLUTE_URL_PATTERN = /^(?:[a-z][a-z\d+\-.]*:)?\/\//i;
+
 function projectHaystack(project) {
   return [
     project.title,
@@ -64,6 +66,14 @@ function collectProjectImages(projects) {
   const addImage = (project, image, fallbackCaption) => {
     const source = typeof image === 'string' ? image : image?.src;
     if (!source || seen.has(source)) return;
+    if (
+      ABSOLUTE_URL_PATTERN.test(source) ||
+      source.startsWith('data:') ||
+      source.startsWith('blob:') ||
+      source.startsWith('#')
+    ) {
+      return;
+    }
 
     seen.add(source);
     images.push({

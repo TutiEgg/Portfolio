@@ -219,43 +219,17 @@
   overflow: hidden;
   border: 1px solid var(--color-border);
   background: var(--color-bg-soft);
-  cursor: zoom-in;
-  transform-origin: center center;
+  cursor: pointer;
   transition:
-    transform 420ms cubic-bezier(0.2, 0.8, 0.2, 1),
     border-color 0.25s var(--ease-out),
     box-shadow 0.35s var(--ease-out);
-  will-change: transform;
 }
 
-/*
- * Hover-zoom: enlarge image under the cursor so small figures become
- * readable. Only enabled on devices that actually support hover so
- * touch devices don't trigger sticky zoom states.
- */
 @media (hover: hover) and (pointer: fine) {
   .figureLink:hover {
     border-color: var(--color-accent);
     box-shadow: var(--shadow-lg), 0 0 32px rgba(139, 124, 246, 0.35);
-    transform: scale(1.12);
     z-index: 20;
-  }
-
-  .figureRow .figureLink:hover {
-    transform: scale(1.55);
-  }
-
-  /*
-   * In a two-image row anchor the zoom towards the opposite edge so the
-   * enlarged figure grows into the dialog centre instead of being
-   * clipped by the dialog border.
-   */
-  .figureRow .figure:first-child .figureLink:hover {
-    transform-origin: left center;
-  }
-
-  .figureRow .figure:last-child .figureLink:hover {
-    transform-origin: right center;
   }
 }
 
@@ -287,7 +261,7 @@
   height: 100%;
   padding: 0;
   overflow: hidden;
-  cursor: zoom-in;
+  cursor: pointer;
 }
 
 .slideshowImage {
@@ -666,13 +640,4 @@
     min-width: 20px;
   }
 
-  /*
-   * Narrower viewport: cap the hover-zoom so the enlarged figure stays
-   * inside the dialog and doesn't get clipped.
-   */
-  .figureLink:hover,
-  .figureRow .figureLink:hover {
-    transform: scale(1.06);
-    transform-origin: center center;
-  }
 }
