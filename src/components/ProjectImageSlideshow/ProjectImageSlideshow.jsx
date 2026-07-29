@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { COPY } from '../../data/copy.js';
 import { assetPath } from '../../utils/assetPath.js';
 import styles from './ProjectImageSlideshow.module.css';
 
@@ -21,7 +22,7 @@ function ArrowIcon({ direction }) {
   );
 }
 
-export function ProjectImageSlideshow({ images = [] }) {
+export function ProjectImageSlideshow({ images = [], copy = COPY.de.projectImages }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const slideCount = images.length;
   const activeImage = images[activeIndex] ?? images[0];
@@ -56,9 +57,9 @@ export function ProjectImageSlideshow({ images = [] }) {
       aria-labelledby="project-images-heading"
     >
       <div className={styles.header}>
-        <p className={styles.eyebrow}>Projektbilder</p>
+        <p className={styles.eyebrow}>{copy.eyebrow}</p>
         <h2 id="project-images-heading" className={styles.heading}>
-          Einblicke aus allen Projekten
+          {copy.heading}
         </h2>
       </div>
 
@@ -84,7 +85,7 @@ export function ProjectImageSlideshow({ images = [] }) {
                 type="button"
                 className={styles.control}
                 onClick={goToPrevious}
-                aria-label="Vorheriges Projektbild"
+                aria-label={copy.previous}
               >
                 <ArrowIcon direction="previous" />
               </button>
@@ -95,7 +96,7 @@ export function ProjectImageSlideshow({ images = [] }) {
                 type="button"
                 className={styles.control}
                 onClick={goToNext}
-                aria-label="Nächstes Projektbild"
+                aria-label={copy.next}
               >
                 <ArrowIcon direction="next" />
               </button>

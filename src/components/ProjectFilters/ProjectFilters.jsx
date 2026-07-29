@@ -1,4 +1,5 @@
 import styles from './ProjectFilters.module.css';
+import { COPY } from '../../data/copy.js';
 
 export function ProjectFilters({
   filters,
@@ -6,11 +7,12 @@ export function ProjectFilters({
   onFilterChange,
   totalCount,
   visibleCount,
+  copy = COPY.de.filters,
 }) {
   if (!filters?.length) return null;
 
   return (
-    <div className={styles.filters} aria-label="Projektfilter">
+    <div className={styles.filters} aria-label={copy.ariaLabel}>
       <div className={styles.filterRail}>
         {filters.map((filter) => (
           <button
@@ -29,7 +31,7 @@ export function ProjectFilters({
         ))}
       </div>
       <p className={styles.summary}>
-        {visibleCount} / {totalCount} Case Studies
+        {copy.summary(visibleCount, totalCount)}
       </p>
     </div>
   );

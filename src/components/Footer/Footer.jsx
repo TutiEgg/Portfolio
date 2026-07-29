@@ -1,17 +1,17 @@
 import { SocialIcon } from '../icons/SocialIcon.jsx';
+import { COPY } from '../../data/copy.js';
 import styles from './Footer.module.css';
 
-export function Footer({ profile }) {
+export function Footer({ profile, copy = COPY.de.footer }) {
   const year = new Date().getFullYear();
 
   return (
     <footer className={styles.footer}>
       <div className={styles.inner}>
         <div className={styles.contact}>
-          <p className={styles.kicker}>Kontakt</p>
-          <h2 className={styles.heading}>Applied AI, Security & Smart-Grid Systeme</h2>
+          <p className={styles.kicker}>{copy.kicker}</p>
           <p className={styles.copy}>
-            &copy; {year} {profile.name}. Gebaut mit React, Vite und Framer Motion.
+            {copy.copy(year, profile.name)}
           </p>
           <ul className={styles.socials}>
             {(profile.socials ?? []).map((social) => (
@@ -29,7 +29,7 @@ export function Footer({ profile }) {
           </ul>
         </div>
 
-        <a href="#hero" className={styles.backToTop} aria-label="Zurück nach oben">
+        <a href="#hero" className={styles.backToTop} aria-label={copy.backToTop}>
           <svg
             width="18"
             height="18"
@@ -45,7 +45,7 @@ export function Footer({ profile }) {
               strokeLinejoin="round"
             />
           </svg>
-          <span>Top</span>
+          <span>{copy.top}</span>
         </a>
       </div>
     </footer>

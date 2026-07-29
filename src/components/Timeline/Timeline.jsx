@@ -1,5 +1,6 @@
 import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import { motion, useScroll, useSpring } from 'framer-motion';
+import { COPY, DEFAULT_LANGUAGE } from '../../data/copy.js';
 import { ProjectFilters } from '../ProjectFilters/ProjectFilters.jsx';
 import { TimelineItem } from './TimelineItem.jsx';
 import { YearIndex } from './YearIndex.jsx';
@@ -8,12 +9,15 @@ import styles from './Timeline.module.css';
 /**
  * Vertical, alternating project timeline with a scroll-progress line,
  * a fixed year index on the right edge and a click handler that surfaces
- * the "Mehr Info" modal to the parent component.
+ * the project detail modal to the parent component.
  */
 
 export const Timeline = forwardRef(function Timeline(
   {
     projects,
+    language = DEFAULT_LANGUAGE,
+    copy = COPY.de.timeline,
+    filterCopy = COPY.de.filters,
     filters = [],
     activeFilter = 'all',
     onFilterChange = () => {},
@@ -102,17 +106,16 @@ export const Timeline = forwardRef(function Timeline(
       }}
     >
       <div className={styles.header}>
-        <p className={styles.eyebrow}>Timeline</p>
-        <h2 className={styles.heading}>Karriere &amp; Projekte</h2>
-        <p className={styles.subheading}>
-          Ein chronologischer Überblick über Stationen, die mich am meisten geprägt haben.
-        </p>
+        <p className={styles.eyebrow}>{copy.eyebrow}</p>
+        <h2 className={styles.heading}>{copy.heading}</h2>
+        <p className={styles.subheading}>{copy.subheading}</p>
         <ProjectFilters
           filters={filters}
           activeFilter={activeFilter}
           onFilterChange={onFilterChange}
           totalCount={totalProjectCount}
           visibleCount={projects.length}
+          copy={filterCopy}
         />
       </div>
 
@@ -130,6 +133,8 @@ export const Timeline = forwardRef(function Timeline(
               key={project.id}
               index={index}
               project={project}
+              language={language}
+              copy={copy}
               side={index % 2 === 0 ? 'left' : 'right'}
               isActive={index === activeIndex}
               onOpen={() => onOpenProject(project)}
@@ -142,6 +147,8 @@ export const Timeline = forwardRef(function Timeline(
       <YearIndex
         projects={projects}
         activeIndex={activeIndex}
+        language={language}
+        copy={copy}
         onProjectClick={handleProjectClick}
       />
     </section>

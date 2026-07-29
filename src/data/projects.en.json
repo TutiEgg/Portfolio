@@ -1,0 +1,732 @@
+[
+  {
+    "id": "silgentas-2026",
+    "title": "SILGENTAS ? Secure KOF Coordination and Anomaly Detection for Smart Districts",
+    "month": "2026-06",
+    "exactDate": "June 2026 (completion)",
+    "location": "U-Glow GmbH ? SILGENTAS research project",
+    "image": "/images/silgentas/dashboard.png",
+    "shortDescription": "Development of a security and coordination framework for smart district energy systems under ?14a EnWG, ?9 EEG and BSI TR-03109. The work combined a coordination function for fair CLS asset curtailment, ML-based anomaly detection for IoT and smart-meter traffic, and robust evaluation with fault injection, availability metrics and SAC-based reinforcement-learning coordination.",
+    "languages": [
+      "Python",
+      "JavaScript"
+    ],
+    "tags": [
+      "Smart Grid",
+      "?14a EnWG",
+      "?9 EEG",
+      "BSI TR-03109",
+      "Coordination Function",
+      "CLS / SMGw",
+      "Reinforcement Learning",
+      "Soft Actor-Critic",
+      "Anomaly Detection",
+      "IoT Security",
+      "CNN-BiLSTM",
+      "PyTorch",
+      "FastAPI",
+      "MQTT",
+      "IEC 61850",
+      "CLS.EDI",
+      "Availability Modeling",
+      "Fault Injection"
+    ],
+    "links": [],
+    "content": [
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "What is it about?"
+      },
+      {
+        "type": "image",
+        "src": "/images/silgentas/dashboard.png",
+        "alt": "SILGENTAS network security dashboard with live event stream, severity filters and MITM event details"
+      },
+      {
+        "type": "paragraph",
+        "text": "**SILGENTAS** explores how smart districts can be coordinated securely, interoperably and in line with regulation when many controllable consumers and generators operate on the low-voltage grid at the same time."
+      },
+      {
+        "type": "paragraph",
+        "text": "The technical core is the **coordination function (KOF)**. It receives curtailment or emergency limits from the distribution grid operator, computes non-discriminatory allocations for CLS assets and forwards those decisions through the regulated MSB, GWA and SMGw chain. In parallel, a security module detects anomalies on IoT and smart-meter interfaces."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "My Role"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Analyzed requirements and architecture for the complete ?14a control path from grid operator to CLS assets.",
+          "Designed and implemented an ML-based anomaly-detection pipeline with CNN1D, ResNet50-1D and CNN-BiLSTM models plus FastAPI inference.",
+          "Designed statistical fallback methods for protocols without labeled datasets, including IEC 61850 MMS, AR 2829 and CLS.EDI.",
+          "Built a demonstrator with security dashboard, CSV upload, live event stream simulation, severity filters and event details.",
+          "Evaluated KOF coordination with Soft Actor-Critic, fault scenarios, availability modeling and fallback policies."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Security and Model Results"
+      },
+      {
+        "type": "image",
+        "src": "/images/silgentas/confusion-cnn-bilstm.png",
+        "alt": "Row-normalized confusion matrix of the CNN-BiLSTM model for IoT attack and normal-traffic classes"
+      },
+      {
+        "type": "paragraph",
+        "text": "The evaluation prioritized **macro recall**, because rare attack classes must not be hidden by frequent normal traffic. CNN-BiLSTM became the primary deployment recommendation because it provided the most stable class-balanced performance."
+      },
+      {
+        "type": "list",
+        "items": [
+          "CNN-BiLSTM: 84.37% macro recall and 85.92% accuracy.",
+          "CNN1D: 92.60% accuracy but weaker balance across minority classes.",
+          "ResNet50-1D: strong individual classes, but less stable assumptions for tabular network features.",
+          "Unlabeled protocol hops were covered with statistical correlation detection and entropy analysis."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Coordination and Availability"
+      },
+      {
+        "type": "image",
+        "src": "/images/silgentas/availability-heatmap.png",
+        "alt": "Availability heatmap of the KOF control chain across twelve fault scenarios"
+      },
+      {
+        "type": "paragraph",
+        "text": "The KOF was modeled as part of a full control chain with grid operator, MSB, GWA, SMGw, iMSys and EMS components. A fault-aware Soft-Actor-Critic agent learned to keep the available capacity fully used while maintaining fairer allocations than a proportional baseline."
+      },
+      {
+        "type": "imageRow",
+        "images": [
+          {
+            "src": "/images/silgentas/blackout-uncoordinated.png",
+            "alt": "Uncoordinated Frankfurt demo where demand exceeds the capacity limit"
+          },
+          {
+            "src": "/images/silgentas/kof-managed-curtailment.png",
+            "alt": "KOF-managed Frankfurt demo with allocation capped at the capacity limit"
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Outcome"
+      },
+      {
+        "type": "list",
+        "items": [
+          "A traceable architecture and requirements framework for secure district coordination.",
+          "A combined ML and statistical security concept for multiple communication hops.",
+          "A fault-aware KOF demonstrator with SAC agent, fallback policies, availability heatmaps and quantitative evaluation.",
+          "A clear coordination result: SAC uses the available capacity fully, reduces energy-not-served to 0 kWh and allocates more fairly than the proportional baseline."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "rilkosan-2026",
+    "title": "RILKOSAN ? Real-Time Anomaly Detection for Industrial EtherCAT Networks",
+    "month": "2026-03",
+    "exactDate": "January 2023 ? March 2026 (completion)",
+    "location": "U-Glow GmbH ? BMFTR-funded research project",
+    "image": "/images/rilkosan/setup.png",
+    "shortDescription": "Real-time anomaly and intrusion-detection framework for industrial EtherCAT networks. The core is a hybrid four-layer architecture with a rule engine, online learning, LightGBM and a Temporal Convolutional Network following the Act Fast, Correct Later principle, extended by a self-healing network-switching mechanism and validated on a real Beckhoff testbed.",
+    "languages": [
+      "Python"
+    ],
+    "tags": [
+      "Anomaly Detection",
+      "Intrusion Detection",
+      "Industrial Cybersecurity",
+      "EtherCAT",
+      "TwinCAT 3 / Beckhoff",
+      "Online Machine Learning",
+      "River ? HalfSpaceTrees",
+      "LightGBM",
+      "Temporal Convolutional Network",
+      "Apache Kafka",
+      "Self-Healing Networks",
+      "OPC UA PA"
+    ],
+    "links": [
+      {
+        "label": "Final Review Meeting (Hamburg, 26.03.2026)",
+        "url": "https://www.bmftr.bund.de/"
+      }
+    ],
+    "content": [
+      {
+        "type": "slideshow",
+        "eyebrow": "Final Review Meeting",
+        "title": "Final Presentation & Demonstrator",
+        "images": [
+          {
+            "src": "/images/rilkosan/final-review/presentation.jpeg",
+            "alt": "Presentation of the RILKOSAN demonstrator during the final review",
+            "caption": "Final project presentation with demonstrator and research results."
+          },
+          {
+            "src": "/images/rilkosan/final-review/demonstrator-detail.jpeg",
+            "alt": "Detailed view of the RILKOSAN demonstrator with Beckhoff components and live analysis",
+            "caption": "Live demo on the Beckhoff testbed with passive EtherCAT capture and real-time analysis."
+          },
+          {
+            "src": "/images/rilkosan/final-review/demonstrator-overview.jpeg",
+            "alt": "Overview of the demonstrator presentation with monitor and test setup",
+            "caption": "Demonstration of capture, analysis and detection logic working together."
+          },
+          {
+            "src": "/images/rilkosan/final-review/audience.jpeg",
+            "alt": "Participants at the RILKOSAN final review meeting",
+            "caption": "Final review meeting in Hamburg with project partners and technical discussion."
+          },
+          {
+            "src": "/images/rilkosan/final-review/team.jpg",
+            "alt": "Project team and partners at the RILKOSAN final review",
+            "caption": "Project team and partners at the close of the RILKOSAN research project."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "What is it about?"
+      },
+      {
+        "type": "paragraph",
+        "text": "Industrial control systems are the backbone of modern production and an increasingly attractive cyber target. **EtherCAT** is optimized for determinism and speed, not for security, so classic IT intrusion-detection systems are too slow for many control loops."
+      },
+      {
+        "type": "paragraph",
+        "text": "In **RILKOSAN**, I designed, implemented and validated a real-time anomaly and intrusion-detection framework for EtherCAT-based industrial networks, including a self-healing mechanism that can switch to a redundant communication path."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "My Role"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Designed the detection architecture around latency budgets, explainability and industrial deployment constraints.",
+          "Implemented the detection pipeline in Python, including rule engine, online-learning ensemble, LightGBM classifier and Temporal Convolutional Network.",
+          "Built the real Beckhoff testbed and evaluated the system on 100,000 frames with ten anomaly types.",
+          "Contributed the concept for event- and stream-centric OPC UA PA extensions."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Four-Layer Detection Architecture"
+      },
+      {
+        "type": "image",
+        "src": "/images/rilkosan/architektur.png",
+        "alt": "Four-layer RILKOSAN detection architecture with rule engine, online learning, LightGBM and TCN"
+      },
+      {
+        "type": "paragraph",
+        "text": "The architecture follows **Act Fast, Correct Later**: fast layers react immediately, slower layers provide stronger context and correct earlier decisions when enough evidence is available."
+      },
+      {
+        "type": "list",
+        "items": [
+          "Layer 1: deterministic protocol and domain rules with sub-millisecond runtime.",
+          "Layer 2: online-learning ensemble with River and HalfSpaceTrees for adaptive anomaly scoring.",
+          "Layer 3: LightGBM classifier on engineered temporal features.",
+          "Layer 4: Temporal Convolutional Network for longer sequence dependencies and feedback."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Evaluation and Demonstrator"
+      },
+      {
+        "type": "imageRow",
+        "images": [
+          {
+            "src": "/images/rilkosan/latency.png",
+            "alt": "Inference latency and time-to-first-detection for the four detection layers"
+          },
+          {
+            "src": "/images/rilkosan/metrics_per_layer.png",
+            "alt": "Accuracy, precision and recall per detection layer"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "text": "The evaluation used a reproducible 100,000-frame dataset with ten injected anomaly types. L4 reached the strongest overall accuracy, while the L1+L2+L3 ensemble delivered the practical sensitivity and response-time tradeoff."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Outcome"
+      },
+      {
+        "type": "list",
+        "items": [
+          "A working hybrid detection system for real-time EtherCAT environments.",
+          "A passive capture architecture that does not interfere with the control path.",
+          "A self-healing route-switching concept for network-related faults.",
+          "Results documented in a journal whitepaper as first author and presented at the final review meeting on March 26, 2026."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "project-charta-2025",
+    "title": "Project Charta ? AI-Supported Hazard Detection Along Pipeline Corridors",
+    "month": "2025-10",
+    "exactDate": "July ? October 2025",
+    "location": "Private full-stack AI/GIS project",
+    "image": "/images/project-charta/hero.png",
+    "shortDescription": "Browser-based analysis platform that uploads a pipeline route, automatically loads satellite imagery, detects trees and buildings with a two-stage YOLOv8 and ResNet-18 AI pipeline, and calculates object-level risk labels using geometric buffer zones. Built end to end as a solo project with React, FastAPI, Celery, PyTorch and a GeoPandas/Shapely/Rasterio GIS stack.",
+    "languages": [
+      "Python",
+      "JavaScript"
+    ],
+    "tags": [
+      "Computer Vision",
+      "Object Detection",
+      "Remote Sensing",
+      "GIS",
+      "GeoPandas",
+      "Shapely",
+      "Rasterio",
+      "PyProj",
+      "YOLOv8",
+      "ResNet-18",
+      "FastAPI",
+      "Celery",
+      "Leaflet",
+      "React",
+      "Risk Scoring"
+    ],
+    "links": [],
+    "content": [
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "What is it about?"
+      },
+      {
+        "type": "image",
+        "src": "/images/project-charta/hero.png",
+        "alt": "Project Charta main view with satellite imagery and analyzed pipeline corridor"
+      },
+      {
+        "type": "paragraph",
+        "text": "**Project Charta** automates a workflow that is often still manual in utility operations: checking protected corridors around water, gas or district-heating pipelines for buildings and deep-rooted trees."
+      },
+      {
+        "type": "paragraph",
+        "text": "The user uploads a route as KML or GeoJSON, the system loads and tiles satellite imagery, AI models detect potential hazard objects, and a GIS module calculates distances, buffer-zone intersections and risk labels."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "My Role"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Designed and implemented the complete product as a solo full-stack project.",
+          "Built the React and Leaflet frontend with map layers, upload flow, crop preview, progress timeline and report panel.",
+          "Implemented the FastAPI and Celery backend for asynchronous processing.",
+          "Trained and deployed YOLOv8 object detectors and a ResNet-18 verification model.",
+          "Built the GIS module for reprojection, buffers, intersections and risk classification."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "AI and GIS Pipeline"
+      },
+      {
+        "type": "imageRow",
+        "images": [
+          {
+            "src": "/images/project-charta/workflow.png",
+            "alt": "Project Charta workflow from route upload to final risk report"
+          },
+          {
+            "src": "/images/project-charta/tiling_preview.png",
+            "alt": "Tiling preview showing which image tiles will be analyzed"
+          }
+        ]
+      },
+      {
+        "type": "list",
+        "items": [
+          "Stage 1: YOLOv8 instance segmentation detects buildings and trees on each tile.",
+          "Stage 2: ResNet-18 verifies every proposal with RGB image data plus the segmentation mask.",
+          "Stage 3: geometric risk analysis projects detections into metric coordinates and intersects them with configurable buffer zones.",
+          "Stage 4: the UI exposes layers, details, run history and exportable reports."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Interactive Analysis and Reports"
+      },
+      {
+        "type": "imageRow",
+        "images": [
+          {
+            "src": "/images/project-charta/feature_details.png",
+            "alt": "Feature detail panel with class, distance, risk label and confidence"
+          },
+          {
+            "src": "/images/project-charta/report_panel.png",
+            "alt": "Report panel with run history, detection counts, confidence insights and risk distribution"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "text": "Each detected object can be inspected on the map with class, confidence, distance and risk category. Reports can be exported as JSON, CSV or ZIP packages and imported into another instance."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Outcome"
+      },
+      {
+        "type": "list",
+        "items": [
+          "A complete end-to-end system from satellite-image acquisition to georeferenced risk analysis.",
+          "A measurable AI pipeline with high recall emphasis because missed objects are the larger safety risk.",
+          "A practical validation run on a real water-pipeline route near M?lheim an der Ruhr.",
+          "A production-oriented codebase combining frontend, backend, ML and GIS in one workflow."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "flugsim-geodesic-2024",
+    "title": "3D Flight Simulation on a Spherical Earth (Geodesic Path Calculation)",
+    "month": "2024-09",
+    "exactDate": "September 2024",
+    "location": "Private Java simulation project",
+    "image": "https://github.com/user-attachments/assets/2c1fe583-0ed8-4c33-be48-165be1588b34",
+    "shortDescription": "Development of a 3D flight simulation that calculates and visualizes realistic flight routes along geodesic great-circle paths on a sphere. The focus was mathematically correct route calculation and transforming 3D coordinates into a visual 2D representation.",
+    "languages": [
+      "Java"
+    ],
+    "tags": [
+      "Java",
+      "3D Math",
+      "Geodesics",
+      "Spherical Coordinates",
+      "Great Circle",
+      "Linear Algebra",
+      "2D Projection",
+      "Rendering"
+    ],
+    "links": [
+      {
+        "label": "Release v1",
+        "url": "https://github.com/TutiEgg/FlugSim/releases/tag/v1"
+      },
+      {
+        "label": "Repository",
+        "url": "https://github.com/TutiEgg/FlugSim"
+      }
+    ],
+    "content": [
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Approach"
+      },
+      {
+        "type": "paragraph",
+        "text": "The simulation uses mathematical formulas in 3D space to place points on a sphere, calculate the angle between route endpoints and render the resulting great-circle path."
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Points on the Sphere"
+      },
+      {
+        "type": "paragraph",
+        "text": "The points on the sphere are computed from geographic spherical coordinates and the sphere radius."
+      },
+      {
+        "type": "image",
+        "src": "https://github.com/user-attachments/assets/dfc024c8-4d80-4d52-8f88-fc487fa295fc",
+        "alt": "Spherical coordinates and points on the sphere"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Angle Between Two Vectors"
+      },
+      {
+        "type": "paragraph",
+        "text": "The angle is calculated from the dot product of the unit vectors that point to the two route endpoints."
+      },
+      {
+        "type": "image",
+        "src": "https://github.com/user-attachments/assets/d0e28545-b59f-43c1-986d-72472dc96e9a",
+        "alt": "Angle calculation using the dot product"
+      },
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Great Circle and Projection"
+      },
+      {
+        "type": "paragraph",
+        "text": "A rotation matrix defines the great-circle plane. Points along the route are generated from the parametric formula and then projected from 3D into 2D screen space."
+      },
+      {
+        "type": "imageRow",
+        "images": [
+          {
+            "src": "https://github.com/user-attachments/assets/a971b778-6d15-4a1d-89d4-bc84c8579855",
+            "alt": "Procedure for defining the great circle"
+          },
+          {
+            "src": "https://github.com/user-attachments/assets/1853045b-03b0-46c8-817f-52ecd3380e8c",
+            "alt": "Projection from 3D to 2D"
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Outcome"
+      },
+      {
+        "type": "paragraph",
+        "text": "The project demonstrates route generation on a spherical earth model, including great-circle geometry, vector math, rotation matrices and a wireframe rendering approach."
+      }
+    ]
+  },
+  {
+    "id": "weather-forecasting-2024",
+    "title": "Deep Learning vs. Statistical Models for Time Series Forecasting",
+    "month": "2024-02",
+    "exactDate": "February 2024",
+    "location": "Academic machine-learning project",
+    "image": "/images/weather/Datensatz_plot.PNG",
+    "shortDescription": "Comparison of multiple models for weather time-series forecasting, including classical statistical methods such as SARIMA and modern deep-learning approaches such as LSTM and Transformer models. The goal was to analyze differences in accuracy, scalability and model behavior across frequencies and dataset characteristics.",
+    "languages": [
+      "Python"
+    ],
+    "tags": [
+      "TensorFlow / Keras",
+      "NumPy",
+      "Pandas",
+      "Matplotlib",
+      "SARIMA (statsmodels)",
+      "LSTM",
+      "Transformer",
+      "Time Series Analysis"
+    ],
+    "links": [],
+    "content": [
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Introduction"
+      },
+      {
+        "type": "paragraph",
+        "text": "Weather forecasting relies on mathematical models of the atmosphere and increasingly uses deep-learning approaches. This project compared LSTM and Transformer architectures with SARIMA-style statistical baselines."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Dataset and Preprocessing"
+      },
+      {
+        "type": "image",
+        "src": "/images/weather/Datensatz_plot.PNG",
+        "alt": "Weather dataset visualization"
+      },
+      {
+        "type": "paragraph",
+        "text": "The dataset from the Max Planck Institute contains meteorological measurements from 2009 to 2016. It includes variables such as temperature, pressure and wind speed and was resampled, cleaned and normalized before training."
+      },
+      {
+        "type": "imageRow",
+        "images": [
+          {
+            "src": "/images/weather/Wind_1.PNG",
+            "alt": "Wind data visualization, first view"
+          },
+          {
+            "src": "/images/weather/Wind_2.PNG",
+            "alt": "Wind data visualization, second view"
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Models and Methodology"
+      },
+      {
+        "type": "list",
+        "items": [
+          "SARIMA: a statistical model for stationary time series with seasonal effects.",
+          "LSTM: a recurrent neural network for long-term dependencies in sequential data.",
+          "Transformer: an attention-based architecture for longer sequences and complex temporal patterns."
+        ]
+      },
+      {
+        "type": "imageRow",
+        "images": [
+          {
+            "src": "/images/weather/SARIMA_vorhersage_6H.PNG",
+            "alt": "SARIMA forecast with six-hour frequency"
+          },
+          {
+            "src": "/images/weather/Transformer_taeglich.PNG",
+            "alt": "Transformer daily forecast result"
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Results and Discussion"
+      },
+      {
+        "type": "paragraph",
+        "text": "The results showed that model choice depends strongly on data frequency and stationarity. SARIMA was efficient for shorter, more stationary series, while LSTM and Transformer models handled more complex sequence behavior better when enough training data and compute were available."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Outcome"
+      },
+      {
+        "type": "list",
+        "items": [
+          "A structured comparison of statistical and deep-learning models for weather time series.",
+          "A preprocessing workflow for faulty values, wind-vector transformation and normalization.",
+          "A practical analysis of model complexity, frequency dependence, overfitting and loss-function choice."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "signal-processing-gui-2023",
+    "title": "Modular GUI for Signal Processing and Data Preprocessing",
+    "month": "2023-10",
+    "exactDate": "October 2023",
+    "location": "Private Python desktop-tool project",
+    "image": "/images/gui/MAIN.PNG",
+    "shortDescription": "Development of a modular desktop application for visualizing, editing and transforming time-series signals. The GUI makes it possible to combine preprocessing steps through a drag-and-drop pipeline and dynamically configure signal-processing functions.",
+    "languages": [
+      "Python"
+    ],
+    "tags": [
+      "PySide2 (Qt)",
+      "Bokeh",
+      "NumPy",
+      "Signal Processing",
+      "GUI Design",
+      "Drag and Drop"
+    ],
+    "links": [
+      {
+        "label": "Repository",
+        "url": "https://github.com/TutiEgg/GUI"
+      }
+    ],
+    "content": [
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Main Window"
+      },
+      {
+        "type": "paragraph",
+        "text": "The application starts from **main.py** and provides a workspace for importing, visualizing and editing time-series signals."
+      },
+      {
+        "type": "image",
+        "src": "/images/gui/MAIN.PNG",
+        "alt": "Main window of the signal-processing GUI"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Imported signals are shown in a list and can be added, hidden or removed.",
+          "Processed signals are listed separately and can be selected for export.",
+          "The navigation already supports additional future pages for manual cutting and general visualization."
+        ]
+      },
+      {
+        "type": "imageRow",
+        "images": [
+          {
+            "src": "/images/gui/list_import.PNG",
+            "alt": "List of imported signals"
+          },
+          {
+            "src": "/images/gui/list_export.PNG",
+            "alt": "List of processed signals selected for export"
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Settings Window"
+      },
+      {
+        "type": "paragraph",
+        "text": "The settings window contains available filters and transformation functions. Functions can be added to the processing pipeline and configured individually."
+      },
+      {
+        "type": "image",
+        "src": "/images/gui/settings_window.PNG",
+        "alt": "Settings window with filter and transformation functions"
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Parameter Settings Window"
+      },
+      {
+        "type": "paragraph",
+        "text": "Parameter dialogs are generated from function annotations so each selected operation can expose its own configuration fields."
+      },
+      {
+        "type": "image",
+        "src": "/images/gui/parameter_settings_window.PNG",
+        "alt": "Parameter settings window"
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Planned Extensions"
+      },
+      {
+        "type": "list",
+        "items": [
+          "Show docstrings from processing functions as contextual help.",
+          "Validate parameter inputs and surface errors in a dedicated error UI.",
+          "Use configured parameters for clearer output-signal names.",
+          "Support additional file formats and data types such as image series from ToF sensors."
+        ]
+      }
+    ]
+  }
+]

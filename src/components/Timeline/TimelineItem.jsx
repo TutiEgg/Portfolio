@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
+import { COPY, DEFAULT_LANGUAGE } from '../../data/copy.js';
 import { assetPath } from '../../utils/assetPath.js';
 import { parseMonth } from '../../utils/formatMonth.js';
 import { TechStackTags } from '../TechStackTags/TechStackTags.jsx';
@@ -51,6 +52,8 @@ function getCaseStats(project) {
 export function TimelineItem({
   index,
   project,
+  language = DEFAULT_LANGUAGE,
+  copy = COPY.de.timeline,
   side,
   isActive,
   onOpen,
@@ -74,7 +77,7 @@ export function TimelineItem({
     }
   }, [index, registerRef]);
 
-  const [year, monthShort] = parseMonth(project.month);
+  const [year, monthShort] = parseMonth(project.month, language);
   const projectImage = assetPath(project.image);
   const caseStats = getCaseStats(project);
 
@@ -167,7 +170,7 @@ export function TimelineItem({
         </motion.div>
 
         {caseStats.length > 0 && (
-          <ul className={styles.caseStats} aria-label="Projekt-Kennzahlen">
+          <ul className={styles.caseStats} aria-label={copy.statsLabel}>
             {caseStats.slice(0, 3).map((stat) => (
               <li key={stat}>{stat}</li>
             ))}
@@ -197,7 +200,7 @@ export function TimelineItem({
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
           >
-            Mehr Info
+            {copy.moreInfo}
             <svg
               width="14"
               height="14"

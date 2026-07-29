@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { COPY } from '../../data/copy.js';
 import { useLockBodyScroll } from '../../hooks/useLockBodyScroll.js';
 import { assetPath } from '../../utils/assetPath.js';
 import { TechStackTags } from '../TechStackTags/TechStackTags.jsx';
@@ -35,7 +36,12 @@ const dialogVariants = {
   },
 };
 
-export function ProjectModal({ project, onClose }) {
+export function ProjectModal({
+  project,
+  copy = COPY.de.modal,
+  contentCopy = COPY.de.projectContent,
+  onClose,
+}) {
   const isOpen = Boolean(project);
   const projectImage = assetPath(project?.image);
   const [lightboxImage, setLightboxImage] = useState(null);
@@ -105,7 +111,7 @@ export function ProjectModal({ project, onClose }) {
               type="button"
               onClick={onClose}
               className={styles.close}
-              aria-label="Schließen"
+              aria-label={copy.close}
             >
               <svg
                 width="20"
@@ -154,7 +160,7 @@ export function ProjectModal({ project, onClose }) {
               />
 
               {sections.length > 1 && (
-                <nav className={styles.sectionNav} aria-label="Projektabschnitte">
+                <nav className={styles.sectionNav} aria-label={copy.sectionNav}>
                   {sections.map((section) => (
                     <a key={section.id} href={`#${section.id}`}>
                       {section.label}
@@ -167,6 +173,7 @@ export function ProjectModal({ project, onClose }) {
                 <ProjectContent
                   blocks={project.content}
                   title={project.title}
+                  copy={contentCopy}
                   onImageOpen={openLightbox}
                 />
               ) : (
@@ -184,7 +191,7 @@ export function ProjectModal({ project, onClose }) {
                   {project.gallery?.length > 0 && (
                     <div className={styles.gallery}>
                       <h3 className={styles.galleryTitle}>
-                        Abbildungen &amp; Formeln
+                        {copy.galleryTitle}
                       </h3>
                       <ul className={styles.galleryGrid}>
                         {project.gallery.map((src, index) => (
@@ -197,7 +204,7 @@ export function ProjectModal({ project, onClose }) {
                             >
                               <img
                                 src={assetPath(src)}
-                                alt={`${project.title} — Abbildung ${index + 1}`}
+                                alt={copy.figureAlt(project.title, index + 1)}
                                 className={styles.galleryImage}
                                 loading="lazy"
                               />
@@ -252,7 +259,7 @@ export function ProjectModal({ project, onClose }) {
                 transition={{ duration: 0.2 }}
                 role="dialog"
                 aria-modal="true"
-                aria-label="Bildansicht"
+                aria-label={copy.lightbox}
                 onClick={(event) => {
                   event.stopPropagation();
                   closeLightbox();
@@ -265,7 +272,7 @@ export function ProjectModal({ project, onClose }) {
                     event.stopPropagation();
                     closeLightbox();
                   }}
-                  aria-label="Bildansicht schließen"
+                  aria-label={copy.lightboxClose}
                 >
                   <svg
                     width="20"

@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { COPY, DEFAULT_LANGUAGE } from '../../data/copy.js';
 import { assetPath } from '../../utils/assetPath.js';
 import { SocialIcon } from '../icons/SocialIcon.jsx';
 import styles from './Hero.module.css';
@@ -25,22 +26,16 @@ const itemVariants = {
   },
 };
 
-const focusAreas = [
-  'Machine Learning',
-  'Smart Grid',
-  'Cybersecurity',
-  'Computer Vision',
-];
-
-const signalMetrics = [
-  { label: 'Model work', value: 'ML systems' },
-  { label: 'Focus', value: 'Research → product' },
-  { label: 'Stack', value: 'Python · React' },
-];
-
 const signalBars = [34, 56, 42, 78, 64, 88, 52, 70, 46, 82, 60, 74];
 
-export function Hero({ profile, onScrollToTimeline }) {
+export function Hero({
+  profile,
+  language = DEFAULT_LANGUAGE,
+  copy = COPY.de.hero,
+  languageCopy = COPY.de,
+  onLanguageChange = () => {},
+  onScrollToTimeline,
+}) {
   const {
     name,
     role,
@@ -51,9 +46,24 @@ export function Hero({ profile, onScrollToTimeline }) {
     location,
     socials = [],
   } = profile;
+  const languageOptions = languageCopy.languageOptions ?? COPY.de.languageOptions;
 
   return (
     <header className={styles.hero} id="hero">
+      <div className={styles.languageToggle} aria-label={languageCopy.languageToggleLabel}>
+        {Object.entries(languageOptions).map(([code, label]) => (
+          <button
+            key={code}
+            type="button"
+            className={language === code ? styles.languageActive : ''}
+            onClick={() => onLanguageChange(code)}
+            aria-pressed={language === code}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
       <motion.div
         className={styles.inner}
         variants={containerVariants}
@@ -69,7 +79,7 @@ export function Hero({ profile, onScrollToTimeline }) {
           <div className={styles.photoGlow} aria-hidden="true" />
           <img
             src={assetPath(photo)}
-            alt={`Portrait of ${name}`}
+            alt={copy.portraitAlt(name)}
             className={styles.photo}
           />
         </motion.div>
@@ -89,7 +99,7 @@ export function Hero({ profile, onScrollToTimeline }) {
           </motion.p>
 
           <motion.ul className={styles.focusPills} variants={itemVariants}>
-            {focusAreas.map((area) => (
+            {copy.focusAreas.map((area) => (
               <li key={area}>{area}</li>
             ))}
           </motion.ul>
@@ -111,11 +121,7 @@ export function Hero({ profile, onScrollToTimeline }) {
 
           <motion.div className={styles.signalPanel} variants={itemVariants}>
             <div className={styles.signalHeader}>
-              <span className={styles.signalStatus}>
-                <span aria-hidden="true" />
-                Available for applied AI
-              </span>
-              <span className={styles.signalCode}>live-stack</span>
+              <span className={styles.signalCode}>{copy.signalCode}</span>
             </div>
             <div className={styles.signalBars} aria-hidden="true">
               {signalBars.map((height, index) => (
@@ -129,7 +135,7 @@ export function Hero({ profile, onScrollToTimeline }) {
               ))}
             </div>
             <dl className={styles.signalMetrics}>
-              {signalMetrics.map((metric) => (
+              {copy.signalMetrics.map((metric) => (
                 <div key={metric.label}>
                   <dt>{metric.label}</dt>
                   <dd>{metric.value}</dd>
@@ -146,7 +152,7 @@ export function Hero({ profile, onScrollToTimeline }) {
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
             >
-              Projekte ansehen
+              {copy.cta}
               <svg
                 width="16"
                 height="16"
@@ -192,7 +198,7 @@ export function Hero({ profile, onScrollToTimeline }) {
         transition={{ delay: 1.5, duration: 0.8 }}
         aria-hidden="true"
       >
-        <span>scroll</span>
+        <span>{copy.scrollHint}</span>
         <motion.div
           className={styles.scrollHintLine}
           animate={{ scaleY: [0.2, 1, 0.2], originY: 0 }}

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { COPY } from '../../data/copy.js';
 import { assetPath } from '../../utils/assetPath.js';
 import styles from './ProjectModal.module.css';
 
@@ -48,14 +49,14 @@ function renderInline(text) {
   );
 }
 
-function Figure({ src, alt, className = '', onImageOpen }) {
+function Figure({ src, alt, className = '', copy = COPY.de.projectContent, onImageOpen }) {
   const resolvedSrc = assetPath(src);
 
   return (
     <button
       type="button"
       onClick={() => onImageOpen?.({ src: resolvedSrc, alt })}
-      aria-label={`Bild öffnen: ${alt}`}
+      aria-label={copy.openImage(alt)}
       className={`${styles.figureLink} ${className}`.trim()}
     >
       <img
@@ -87,7 +88,14 @@ function ArrowIcon({ direction }) {
   );
 }
 
-function Slideshow({ title, eyebrow, images = [], projectTitle, onImageOpen }) {
+function Slideshow({
+  title,
+  eyebrow,
+  images = [],
+  projectTitle,
+  copy = COPY.de.projectContent,
+  onImageOpen,
+}) {
   const [activeIndex, setActiveIndex] = useState(0);
   const slideCount = images.length;
   const activeSlide = images[activeIndex] ?? images[0];
@@ -117,25 +125,25 @@ function Slideshow({ title, eyebrow, images = [], projectTitle, onImageOpen }) {
   };
 
   const activeAlt =
-    activeSlide.alt || `${projectTitle} — Slideshow-Bild ${activeIndex + 1}`;
+    activeSlide.alt || copy.slideshowImage(projectTitle, activeIndex + 1);
   const activeSrc = assetPath(activeSlide.src);
 
   return (
     <section
       className={styles.slideshow}
-      aria-label={title || `${projectTitle} Bildergalerie`}
+      aria-label={title || copy.slideshowGallery(projectTitle)}
     >
       <button
         type="button"
         className={styles.slideshowImageButton}
         onClick={() => onImageOpen?.({ src: activeSrc, alt: activeAlt })}
-        aria-label={`Bild öffnen: ${activeAlt}`}
+        aria-label={copy.openImage(activeAlt)}
       >
         {images.map((slide, index) => (
           <img
             key={slide.src}
             src={assetPath(slide.src)}
-            alt={slide.alt || `${projectTitle} — Slideshow-Bild ${index + 1}`}
+            alt={slide.alt || copy.slideshowImage(projectTitle, index + 1)}
             className={`${styles.slideshowImage} ${
               index === activeIndex ? styles.slideshowImageActive : ''
             }`.trim()}
@@ -159,7 +167,7 @@ function Slideshow({ title, eyebrow, images = [], projectTitle, onImageOpen }) {
               type="button"
               className={styles.slideshowControl}
               onClick={goToPrevious}
-              aria-label="Vorheriges Bild"
+              aria-label={copy.previousImage}
             >
               <ArrowIcon direction="previous" />
             </button>
@@ -167,7 +175,7 @@ function Slideshow({ title, eyebrow, images = [], projectTitle, onImageOpen }) {
               type="button"
               className={styles.slideshowControl}
               onClick={goToNext}
-              aria-label="Nächstes Bild"
+              aria-label={copy.nextImage}
             >
               <ArrowIcon direction="next" />
             </button>
@@ -185,7 +193,7 @@ function Slideshow({ title, eyebrow, images = [], projectTitle, onImageOpen }) {
                 index === activeIndex ? styles.slideshowDotActive : ''
               }`.trim()}
               onClick={() => setActiveIndex(index)}
-              aria-label={`Bild ${index + 1} anzeigen`}
+              aria-label={copy.showImage(index + 1)}
               aria-pressed={index === activeIndex}
             />
           ))}
@@ -195,7 +203,12 @@ function Slideshow({ title, eyebrow, images = [], projectTitle, onImageOpen }) {
   );
 }
 
-export function ProjectContent({ blocks, title, onImageOpen }) {
+export function ProjectContent({
+  blocks,
+  title,
+  copy = COPY.de.projectContent,
+  onImageOpen,
+}) {
   if (!blocks?.length) return null;
 
   return (
@@ -248,10 +261,10 @@ export function ProjectContent({ blocks, title, onImageOpen }) {
         }
 
         if (block.type === 'image') {
-          const alt = block.alt || `${title} — Abbildung ${index + 1}`;
+          const alt = block.alt || copy.figureAlt(title, index + 1);
           return (
             <figure key={key} className={styles.figure}>
-              <Figure src={block.src} alt={alt} onImageOpen={onImageOpen} />
+              <Figure src={block.src} alt={alt} copy={copy} onImageOpen={onImageOpen} />
             </figure>
           );
         }
@@ -274,7 +287,8 @@ export function ProjectContent({ blocks, title, onImageOpen }) {
                   <Figure
                     src={img.src}
                     onImageOpen={onImageOpen}
-                    alt={img.alt || `${title} — Abbildung ${index + 1}.${i + 1}`}
+                    copy={copy}
+                    alt={img.alt || copy.figureAlt(title, `${index + 1}.${i + 1}`)}
                   />
                 </figure>
               ))}
@@ -290,6 +304,7 @@ export function ProjectContent({ blocks, title, onImageOpen }) {
               eyebrow={block.eyebrow}
               images={block.images}
               projectTitle={title}
+              copy={copy}
               onImageOpen={onImageOpen}
             />
           );

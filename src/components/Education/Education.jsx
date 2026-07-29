@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { COPY } from '../../data/copy.js';
 import { GraduationCap } from './GraduationCap.jsx';
 import styles from './Education.module.css';
 
@@ -25,7 +26,7 @@ const itemVariants = {
   },
 };
 
-export function Education({ entries }) {
+export function Education({ entries, copy = COPY.de.education }) {
   if (!entries?.length) return null;
 
   return (
@@ -37,12 +38,12 @@ export function Education({ entries }) {
         viewport={{ once: true, amount: 0.4 }}
         transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
       >
-        <p className={styles.eyebrow}>Education</p>
+        <p className={styles.eyebrow}>{copy.eyebrow}</p>
         <h2 id="education-heading" className={styles.heading}>
-          Ausbildung
+          {copy.heading}
         </h2>
         <p className={styles.subheading}>
-          Akademischer Hintergrund und Studienschwerpunkte.
+          {copy.subheading}
         </p>
       </motion.div>
 
@@ -158,7 +159,7 @@ export function Education({ entries }) {
                 <p className={styles.summary}>{entry.summary}</p>
 
                 {entry.highlights?.length > 0 && (
-                  <ul className={styles.highlights} aria-label="Schwerpunkte">
+                  <ul className={styles.highlights} aria-label={copy.highlightsLabel}>
                     {entry.highlights.map((h) => (
                       <li key={h} className={styles.highlight}>
                         {h}

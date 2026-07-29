@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AmbientBackground } from './components/AmbientBackground/AmbientBackground.jsx';
 import { Hero } from './components/Hero/Hero.jsx';
 import { Education } from './components/Education/Education.jsx';
@@ -6,12 +6,29 @@ import { ProjectImageSlideshow } from './components/ProjectImageSlideshow/Projec
 import { Timeline } from './components/Timeline/Timeline.jsx';
 import { ProjectModal } from './components/ProjectModal/ProjectModal.jsx';
 import { Footer } from './components/Footer/Footer.jsx';
-import profile from './data/profile.json';
-import education from './data/education.json';
-import rawProjects from './data/projects.json';
+import profileDe from './data/profile.json';
+import profileEn from './data/profile.en.json';
+import educationDe from './data/education.json';
+import educationEn from './data/education.en.json';
+import rawProjectsDe from './data/projects.json';
+import rawProjectsEn from './data/projects.en.json';
+import { COPY, DEFAULT_LANGUAGE } from './data/copy.js';
 
-const FILTER_DEFINITIONS = [
-  { id: 'all', label: 'Alle', terms: [] },
+const DATA_BY_LANGUAGE = {
+  de: {
+    profile: profileDe,
+    education: educationDe,
+    projects: rawProjectsDe,
+  },
+  en: {
+    profile: profileEn,
+    education: educationEn,
+    projects: rawProjectsEn,
+  },
+};
+
+const FILTER_DEFINITIONS = (copy) => [
+  { id: 'all', label: copy.filters.all, terms: [] },
   {
     id: 'ai',
     label: 'AI / ML',
@@ -59,7 +76,7 @@ function matchesFilter(project, filter) {
   return filter.terms.some((term) => haystack.includes(term));
 }
 
-function collectProjectImages(projects) {
+function collectProjectImages(projects, copy) {
   const seen = new Set();
   const images = [];
 
@@ -80,7 +97,7 @@ function collectProjectImages(projects) {
       src: source,
       alt:
         (typeof image === 'string' ? undefined : image.alt) ||
-        `${project.title} — Projektbild`,
+        copy.projectImageFallback(project.title),
       caption:
         (typeof image === 'string' ? undefined : image.caption) ||
         fallbackCaption ||
@@ -120,29 +137,51 @@ function collectProjectImages(projects) {
 
 export default function App() {
   const timelineRef = useRef(null);
-  const [selectedProject, setSelectedProject] = useState(null);
+  const [language, setLanguage] = useState(() => {
+    if (typeof window === 'undefined') return DEFAULT_LANGUAGE;
+    const savedLanguage = window.localStorage.getItem('portfolio-language');
+    return savedLanguage && savedLanguage in DATA_BY_LANGUAGE
+      ? savedLanguage
+      : DEFAULT_LANGUAGE;
+  });
+  const [selectedProjectId, setSelectedProjectId] = useState(null);
   const [activeFilter, setActiveFilter] = useState('all');
+  const copy = COPY[language] ?? COPY[DEFAULT_LANGUAGE];
+  const { profile, education, projects: rawProjects } =
+    DATA_BY_LANGUAGE[language] ?? DATA_BY_LANGUAGE[DEFAULT_LANGUAGE];
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+    window.localStorage.setItem('portfolio-language', language);
+  }, [language]);
 
   // Always render most recent projects first, independent of JSON order.
   const projects = useMemo(
     () =>
       [...rawProjects].sort((a, b) => (a.month < b.month ? 1 : -1)),
-    []
+    [rawProjects]
   );
-  const projectImages = useMemo(() => collectProjectImages(projects), [projects]);
+  const projectImages = useMemo(
+    () => collectProjectImages(projects, copy),
+    [copy, projects]
+  );
   const filters = useMemo(
     () =>
-      FILTER_DEFINITIONS.map((filter) => ({
+      FILTER_DEFINITIONS(copy).map((filter) => ({
         ...filter,
         count: projects.filter((project) => matchesFilter(project, filter))
           .length,
       })),
-    [projects]
+    [copy, projects]
   );
   const filteredProjects = useMemo(() => {
     const filter = filters.find((item) => item.id === activeFilter) ?? filters[0];
     return projects.filter((project) => matchesFilter(project, filter));
   }, [activeFilter, filters, projects]);
+  const selectedProject = useMemo(
+    () => projects.find((project) => project.id === selectedProjectId) ?? null,
+    [projects, selectedProjectId]
+  );
 
   const scrollToTimeline = useCallback(() => {
     timelineRef.current?.scrollIntoView({
@@ -151,26 +190,41 @@ export default function App() {
     });
   }, []);
 
-  const openProject = useCallback((project) => setSelectedProject(project), []);
-  const closeProject = useCallback(() => setSelectedProject(null), []);
+  const openProject = useCallback((project) => setSelectedProjectId(project.id), []);
+  const closeProject = useCallback(() => setSelectedProjectId(null), []);
 
   return (
     <>
       <AmbientBackground />
-      <Hero profile={profile} onScrollToTimeline={scrollToTimeline} />
-      <Education entries={education} />
-      <ProjectImageSlideshow images={projectImages} />
+      <Hero
+        profile={profile}
+        language={language}
+        copy={copy.hero}
+        languageCopy={copy}
+        onLanguageChange={setLanguage}
+        onScrollToTimeline={scrollToTimeline}
+      />
+      <Education entries={education} copy={copy.education} />
+      <ProjectImageSlideshow images={projectImages} copy={copy.projectImages} />
       <Timeline
         ref={timelineRef}
         projects={filteredProjects}
+        language={language}
+        copy={copy.timeline}
+        filterCopy={copy.filters}
         filters={filters}
         activeFilter={activeFilter}
         onFilterChange={setActiveFilter}
         totalProjectCount={projects.length}
         onOpenProject={openProject}
       />
-      <Footer profile={profile} />
-      <ProjectModal project={selectedProject} onClose={closeProject} />
+      <Footer profile={profile} copy={copy.footer} />
+      <ProjectModal
+        project={selectedProject}
+        copy={copy.modal}
+        contentCopy={copy.projectContent}
+        onClose={closeProject}
+      />
     </>
   );
 }

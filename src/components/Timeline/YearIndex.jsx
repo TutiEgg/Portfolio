@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { COPY, DEFAULT_LANGUAGE } from '../../data/copy.js';
 import { parseMonth } from '../../utils/formatMonth.js';
 import styles from './YearIndex.module.css';
 
@@ -8,17 +9,23 @@ import styles from './YearIndex.module.css';
  * project is highlighted with a sliding indicator and an accent line.
  */
 
-export function YearIndex({ projects = [], activeIndex = 0, onProjectClick }) {
+export function YearIndex({
+  projects = [],
+  activeIndex = 0,
+  language = DEFAULT_LANGUAGE,
+  copy = COPY.de.timeline,
+  onProjectClick,
+}) {
   if (!projects.length) return null;
 
   return (
-    <nav className={styles.yearIndex} aria-label="Timeline-Navigation">
+    <nav className={styles.yearIndex} aria-label={copy.navigationLabel}>
       <ol className={styles.list}>
         {projects.map((project, index) => {
-          const [year, monthShort] = parseMonth(project.month);
+          const [year, monthShort] = parseMonth(project.month, language);
           const isActive = index === activeIndex;
           const prevYear =
-            index > 0 ? parseMonth(projects[index - 1].month)[0] : null;
+            index > 0 ? parseMonth(projects[index - 1].month, language)[0] : null;
           const showYear = year !== prevYear;
 
           return (
@@ -28,7 +35,7 @@ export function YearIndex({ projects = [], activeIndex = 0, onProjectClick }) {
                 onClick={() => onProjectClick?.(index)}
                 className={`${styles.button} ${isActive ? styles.isActive : ''}`}
                 aria-current={isActive ? 'true' : undefined}
-                aria-label={`Zu ${project.title} (${monthShort} ${year}) scrollen`}
+                aria-label={copy.scrollToProject(project.title, monthShort, year)}
               >
                 <span className={styles.dot} aria-hidden="true">
                   {isActive && (

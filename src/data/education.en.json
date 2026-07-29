@@ -1,0 +1,21 @@
+[
+  {
+    "id": "bsc-medieninformatik-hfu",
+    "degree": "Bachelor of Science",
+    "subject": "Media Informatics",
+    "institution": "Furtwangen University (HFU)",
+    "period": "Graduated 2024",
+    "location": "Furtwangen, Germany",
+    "summary": "Interdisciplinary studies at the interface of software development, mathematics and media design with a focus on machine learning and AI-supported applications.",
+    "highlights": [
+      "Machine Learning & AI",
+      "Software Engineering",
+      "Linear Algebra & Statistics",
+      "Media & Interaction Design"
+    ],
+    "link": {
+      "label": "Furtwangen University",
+      "url": "https://www.hs-furtwangen.de/"
+    }
+  }
+]
